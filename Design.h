@@ -32,11 +32,12 @@
     - Signals:
         1. From process generator to schedular: 1-One signal to inform the schedular that a process was put in the message queue.
                                             2-One signal to inform the schedular that there is no more processes will be sent to it by changing the schedular flag.
+        2. From the process to the schedular algo:When the process finishes executing, it sends a signal to the schedular algo to inform it. 
     
     - IPC:
         1. Message Queues:
             1-  One message queue from process generator to schedular.
-            2-  From the process to the schedular algo:When the process finishes executing, it sends a signal to the schedular algo to inform it. 
+            
 
         2. Semaphores:
             1-  Between process generator and schedular:The process generator will be blocked at down,till the schedular makes it up after receiving the 
