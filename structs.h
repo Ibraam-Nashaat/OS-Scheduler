@@ -5,6 +5,11 @@ int id,
     runningTime;
 };
 
+struct msgBuff{
+   int mtype;
+   struct ProcessStruct* process;
+};
+
 struct QNode {
     struct ProcessStruct* data;
     struct QNode* next;

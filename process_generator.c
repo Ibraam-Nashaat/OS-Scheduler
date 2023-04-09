@@ -34,14 +34,14 @@ int getSchedulingAlgoFromUser(int* algo){
     printf("1- HPF\n");
     printf("2- SRTN\n");
     printf("3- RR\n");
-    scanf("%d",*algo);
+    scanf("%d",&*algo);
     while(*algo<1 || *algo>3){
         printf("Enter a number between 1 and 3:\n");
-        scanf("%d",*algo);
+        scanf("%d",&*algo);
     }
     if(*algo==3){
         printf("Enter the required quantum:\n");
-        scanf("%d",quantum);
+        scanf("%d",&quantum);
     }
     return quantum;
 }
@@ -63,7 +63,7 @@ void createSemaphore(){
         perror("Error in creating semaphore");
         exit(-1);
     }
-    printf("SemID is %d\n",processGeneratorAndSchedulerSemID);
+    
 
     union Semun semun;
     semun.val = 0; /* initial value of the semaphore, Binary semaphore */
@@ -72,6 +72,15 @@ void createSemaphore(){
         perror("Error in semctl");
         exit(-1);
     }
+}
+
+void sendProcess(struct ProcessStruct* process){
+    struct msgBuff message;
+    message.mtype=5;
+    message.process=process;
+    int send = msgsnd(messageQueueID, &message, sizeof(message.process), !IPC_NOWAIT);
+    if (send == -1)
+        perror("Errror in sending message from process generator to scheduler");
 }
 
 int main(int argc, char * argv[])
@@ -89,16 +98,31 @@ int main(int argc, char * argv[])
     createSemaphore();
     createMessageQueue();
 
+    int clkPID=fork();
+    if(clkPID==0){
+        char* args[]={"./clk.out",NULL};
+        execvp(args[0],args);
+    }
+
+    int schedularPID=fork();
+    if(schedularPID==0){
+        char algoAsChar[13],quantumAsChar[13];
+        sprintf(algoAsChar,"%d",algo);
+        sprintf(quantumAsChar,"%d",quantum);
+        char* args[]={"./scheduler.out",algoAsChar,quantumAsChar,NULL};
+        execvp(args[0],args);
+    }
+
     // 4. Use this function after creating the clock process to initialize clock
-    //initClk();
+    initClk();
     // To get time use this
-    //int x = getClk();
+    int x = getClk();
     //printf("current time is %d\n", x);
     // TODO Generation Main Loop
     // 5. Create a data structure for processes and provide it with its parameters.
     // 6. Send the information to the scheduler at the appropriate time.
     // 7. Clear clock resources
-    //destroyClk(true);
+    destroyClk(true);
     
 
     
@@ -107,5 +131,7 @@ int main(int argc, char * argv[])
 void clearResources(int signum)
 {
     //TODO Clears all resources in case of interruption
+    msgctl(messageQueueID, IPC_RMID, (struct msqid_ds *) 0);
+    semctl(processGeneratorAndSchedulerSemID, 0, IPC_RMID, (struct semid_ds *) 0);
 }
 
