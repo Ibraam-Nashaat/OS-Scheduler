@@ -15,7 +15,7 @@
                     1)make a special processID of ID=-1, and send it to the schedular(so that when the schedular sees it, it would change its flag)
                     2)Send a signal to the schedular, such that the schedular signal handler change the flag(I think this way is better)
             4-  The clock resources should be cleared after making sure that the schedular has terminated(waitpid till the schedular terminates)
-
+ 
         2. Schedular:
             1-  It should create the queue or priority queue according to the specified algorithm by the user.
             2-  When it receives the process from the message queue(based on a signal from the process generator), it should add it to the approprate queue or priority queue of the algo.
