@@ -23,7 +23,7 @@ void readFile(struct Queue* processQueue){
         enQueue(processQueue,readProcess);
     }
 
-   // processQueue=testReadFile(processQueue);
+    //processQueue=testReadFile(processQueue);
 
     fclose(file);
 }
@@ -121,13 +121,11 @@ int main(int argc, char * argv[])
     // 6. Send the information to the scheduler at the appropriate time.
     // 7. Clear clock resources
     int clk;
-    printf("%d\n",isEmptyN(processQueue));
     while(!isEmptyN(processQueue)){
         struct ProcessStruct* process=peekN(processQueue);
         clk=getClk();
-        while(1){
+        while(process->arrivalTime>clk){
             clk=getClk();
-            printf("Process arrived at arrival time %d and clk %d\n",process->arrivalTime,clk);
         }
         printf("Process arrived at arrival time %d and clk %d\n",process->arrivalTime,clk);
 
@@ -136,11 +134,11 @@ int main(int argc, char * argv[])
        // down(processGeneratorAndSchedulerSemID);
         deQueue(processQueue);
     }
-
+    printf("hamada");
     //waitpid(schedularPID,NULL,0);
 
     destroyClk(true);
-    
+    return 0;
 
     
 }
@@ -150,7 +148,5 @@ void clearResources(int signum)
     //TODO Clears all resources in case of interruption
     msgctl(messageQueueID, IPC_RMID, (struct msqid_ds *) 0);
     semctl(processGeneratorAndSchedulerSemID, 0, IPC_RMID, (struct semid_ds *) 0);
-    destroyClk(true);
-    kill(schedularPID,SIGINT);
 }
 
