@@ -1,8 +1,8 @@
 #include "headers.h"
 
 void clearResources(int);
-
-void readFile(struct Queue* readFromFileProcessQueue){
+int schedularPID;
+void readFile(struct Queue* processQueue){
     FILE *file;
     file = fopen("processes.txt", "r");
     char firstLine[40];
@@ -20,10 +20,10 @@ void readFile(struct Queue* readFromFileProcessQueue){
         readProcess->arrivalTime=arrivalTime;
         readProcess->runningTime=runningTime;
         readProcess->priority=priority;
-        enQueue(readFromFileProcessQueue,readProcess);
+        enQueue(processQueue,readProcess);
     }
 
-    readFromFileProcessQueue=testReadFile(readFromFileProcessQueue);
+   // processQueue=testReadFile(processQueue);
 
     fclose(file);
 }
@@ -88,8 +88,8 @@ int main(int argc, char * argv[])
     signal(SIGINT, clearResources);
     // TODO Initialization
     // 1. Read the input files.
-    struct Queue* readFromFileProcessQueue=createQueue();
-    readFile(readFromFileProcessQueue);
+    struct Queue* processQueue=createQueue();
+    readFile(processQueue);
     
     // 2. Ask the user for the chosen scheduling algorithm and its parameters, if there are any.
     int algo;
@@ -104,7 +104,7 @@ int main(int argc, char * argv[])
         execvp(args[0],args);
     }
 
-    int schedularPID=fork();
+    schedularPID=fork();
     if(schedularPID==0){
         char algoAsChar[13],quantumAsChar[13];
         sprintf(algoAsChar,"%d",algo);
@@ -115,13 +115,30 @@ int main(int argc, char * argv[])
 
     // 4. Use this function after creating the clock process to initialize clock
     initClk();
-    // To get time use this
-    int x = getClk();
     //printf("current time is %d\n", x);
     // TODO Generation Main Loop
     // 5. Create a data structure for processes and provide it with its parameters.
     // 6. Send the information to the scheduler at the appropriate time.
     // 7. Clear clock resources
+    int clk;
+    printf("%d\n",isEmptyN(processQueue));
+    while(!isEmptyN(processQueue)){
+        struct ProcessStruct* process=peekN(processQueue);
+        clk=getClk();
+        while(1){
+            clk=getClk();
+            printf("Process arrived at arrival time %d and clk %d\n",process->arrivalTime,clk);
+        }
+        printf("Process arrived at arrival time %d and clk %d\n",process->arrivalTime,clk);
+
+        sendProcess(process);
+        kill(schedularPID,SIGUSR1);
+       // down(processGeneratorAndSchedulerSemID);
+        deQueue(processQueue);
+    }
+
+    //waitpid(schedularPID,NULL,0);
+
     destroyClk(true);
     
 
@@ -133,5 +150,7 @@ void clearResources(int signum)
     //TODO Clears all resources in case of interruption
     msgctl(messageQueueID, IPC_RMID, (struct msqid_ds *) 0);
     semctl(processGeneratorAndSchedulerSemID, 0, IPC_RMID, (struct semid_ds *) 0);
+    destroyClk(true);
+    kill(schedularPID,SIGINT);
 }
 
