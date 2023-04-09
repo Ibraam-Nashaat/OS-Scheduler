@@ -22,7 +22,7 @@ typedef short bool;
 //don't mess with this variable//
 int * shmaddr;                 //
 //===============================
-
+ 
 
 
 int getClk()
