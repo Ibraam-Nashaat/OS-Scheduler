@@ -7,7 +7,7 @@ struct ProcessStruct* p1 = (struct ProcessStruct*)malloc(sizeof(struct ProcessSt
 *create the queue and insert elements in it
 ===========================================
 struct Queue* q = createQueue();
-enQueue(q, p1);
+enQueue (q, p1);
 
 *check if the queue is empty
 ============================
