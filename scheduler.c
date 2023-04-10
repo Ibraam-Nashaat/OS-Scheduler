@@ -52,55 +52,60 @@ void pushProcessToRR(struct ProcessStruct process)
 
 void getProcess(int signum)
 {
-    printf("\nANAAA ZHEEEEEE2TTTTTT");
+    printf("ANAAA ZHEEEEEE2TTTTTT\n");
+    printf("%d\n",messageQueueID);
+    fflush(stdout);
+    
     int rec_val = msgrcv(messageQueueID, &message, sizeof(message.process), 5, !IPC_NOWAIT);
 
-    printf("Scheduler Received Process with ID=%d", message.process->id);
+    printf("Scheduler Received Process with ID=%d\n", message.process.id);
+    fflush(stdout);
 
     if (rec_val == -1)
     {
-        perror("Error in receiving from msg queue");
+        perror("Error in receiving from msg queue\n");
     }
-
+    
+    
     switch (selectedAlgorithm)
     {
     case 1:
-        pushProcessToHPF(*message.process);
+        pushProcessToHPF(message.process);
         break;
     case 2:
-        pushProcessToSRTN(*message.process);
+        pushProcessToSRTN(message.process);
         break;
     case 3:
-        pushProcessToRR(*message.process);
+        pushProcessToRR(message.process);
         break;
     }
-
+    
     // Process has been pushed to the queue
     // Up the semaphore to allow process generator to continue
     up(processGeneratorAndSchedulerSemID);
 
     // check if that process was the terminating one (id = -1)
-    if (message.process->id == -1)
+    if (message.process.id == -1)
     {
         flag = 0;
     }
 }
 
 void createMessageQueue(){
-    messageQueueID = msgget(IPC_PRIVATE, 0666 | IPC_CREAT);
+    messageQueueID = msgget(MSQKEY, 0666 | IPC_CREAT);
 
     if (messageQueueID== -1)
     {
-        perror("Error in creating message queue");
+        perror("Error in creating message queue\n");
         exit(-1);
     }
 }
 
 void createSemaphore(){
-    processGeneratorAndSchedulerSemID= semget(IPC_PRIVATE, 1, 0666 | IPC_CREAT);
+    processGeneratorAndSchedulerSemID= semget(SEMKEY, 1, 0666 | IPC_CREAT);
     if (processGeneratorAndSchedulerSemID== -1)
     {
-        perror("Error in creating semaphore");
+        perror("Error in creating semaphore\n");
         exit(-1);
     }
     
@@ -109,7 +114,7 @@ void createSemaphore(){
     semun.val = 0; /* initial value of the semaphore, Binary semaphore */
     if (semctl(processGeneratorAndSchedulerSemID, 0, SETVAL, semun) == -1)
     {
-        perror("Error in semctl");
+        perror("Error in semctl\n");
         exit(-1);
     }
 }
@@ -122,29 +127,26 @@ int main(int argc, char *argv[])
     createMessageQueue();
 
     selectedAlgorithm = atoi(argv[1]);
-    printf("GA3FAR EL 3OMDA %d", selectedAlgorithm);
+    printf("GA3FAR EL 3OMDA %d\n", selectedAlgorithm);
+    fflush(stdout); 
 
     switch (selectedAlgorithm) {
         case 1:
             // Allocate the priority queue
             priorityQueue = createPriorityQueue();
-            //while(1){};
+            while(1){};
             break;
         case 2:
             // Allocate the priority queue
             priorityQueue = createPriorityQueue();
-            //while(1){};
+            while(1){};
             break;
         case 3:
             // Allocate the queue
             queue = createQueue();
-            //while(1){};
+            while(1){};
             break;
     }
-
-    while(1){};
-
-    //sleep(20);
 
     destroyClk(false);
 }

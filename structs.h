@@ -6,8 +6,8 @@ int id,
 };
 
 struct msgBuff{
-   int mtype;
-   struct ProcessStruct* process;
+   long mtype;
+   struct ProcessStruct process;
 };
 
 struct QNode {

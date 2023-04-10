@@ -47,7 +47,7 @@ int getSchedulingAlgoFromUser(int* algo){
 }
 
 void createMessageQueue(){
-    messageQueueID = msgget(IPC_PRIVATE, 0666 | IPC_CREAT);
+    messageQueueID = msgget(MSQKEY, 0666 | IPC_CREAT);
 
     if (messageQueueID== -1)
     {
@@ -57,7 +57,7 @@ void createMessageQueue(){
 }
 
 void createSemaphore(){
-    processGeneratorAndSchedulerSemID= semget(IPC_PRIVATE, 1, 0666 | IPC_CREAT);
+    processGeneratorAndSchedulerSemID= semget(SEMKEY, 1, 0666 | IPC_CREAT);
     if (processGeneratorAndSchedulerSemID== -1)
     {
         perror("Error in creating semaphore");
@@ -77,7 +77,7 @@ void createSemaphore(){
 void sendProcess(struct ProcessStruct* process){
     struct msgBuff message;
     message.mtype=5;
-    message.process=process;
+    message.process=*process;
     int send = msgsnd(messageQueueID, &message, sizeof(message.process), !IPC_NOWAIT);
     if (send == -1)
         perror("Errror in sending message from process generator to scheduler");
@@ -129,13 +129,14 @@ int main(int argc, char * argv[])
         }
         printf("Process arrived at arrival time %d and clk %d\n",process->arrivalTime,clk);
 
-        printf("Ba3atna el signal!");
+        printf("Ba3atna el signal!\n");
+        fflush(stdout); 
         sendProcess(process);
         kill(schedularPID,SIGUSR1);
         down(processGeneratorAndSchedulerSemID);
         deQueue(processQueue);
     }
-    printf("hamada");
+    printf("hamada\n");
     kill(schedularPID,SIGUSR2);
     waitpid(schedularPID,NULL,0);
 
