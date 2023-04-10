@@ -18,6 +18,9 @@ typedef short bool;
 #define false 0
 
 #define SHKEY 300
+#define PROSCH 65
+#define SEMA 70
+
 #include "structs.h"
 #include "Queue.h"
 #include "PQueue.h"

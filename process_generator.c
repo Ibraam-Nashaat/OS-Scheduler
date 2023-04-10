@@ -129,14 +129,15 @@ int main(int argc, char * argv[])
         }
         printf("Process arrived at arrival time %d and clk %d\n",process->arrivalTime,clk);
 
+        printf("Ba3atna el signal!");
         sendProcess(process);
         kill(schedularPID,SIGUSR1);
-       // down(processGeneratorAndSchedulerSemID);
+        down(processGeneratorAndSchedulerSemID);
         deQueue(processQueue);
     }
     printf("hamada");
     kill(schedularPID,SIGUSR2);
-    //waitpid(schedularPID,NULL,0);
+    waitpid(schedularPID,NULL,0);
 
     destroyClk(true);
     return 0;
