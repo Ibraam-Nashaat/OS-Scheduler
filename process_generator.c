@@ -135,6 +135,7 @@ int main(int argc, char * argv[])
         deQueue(processQueue);
     }
     printf("hamada");
+    kill(schedularPID,SIGUSR2);
     //waitpid(schedularPID,NULL,0);
 
     destroyClk(true);
