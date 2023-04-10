@@ -3,10 +3,10 @@
 
 int main(int argc, char * argv[])
 {
-    initClk();
-    
+    //initClk();
+    while(1){}
     //TODO implement the scheduler :)
     //upon termination release the clock resources.
     
-    destroyClk(true);
+   // destroyClk(true);
 }
