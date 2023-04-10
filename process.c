@@ -1,17 +1,23 @@
 #include "headers.h"
 
-/* Modify this file as needed*/
-int remainingtime;
 
 int main(int agrc, char * argv[])
 {
+    int remainingTime,previousTime,currentTime;
     initClk();
+    previousTime=getClk();
+    remainingTime=atoi(argv[1]);
     
     //TODO it needs to get the remaining time from somewhere
-    //remainingtime = ??;
-    while (remainingtime > 0)
+    while (remainingTime > 0)
     {
-        // remainingtime = ??;
+        currentTime=getClk();
+        if(previousTime!=currentTime){
+            remainingTime--;
+        printf("previous time is %d, current time is %d and remaining time is %d\n",
+                previousTime,currentTime,remainingTime);
+        }
+        previousTime=currentTime;
     }
     
     destroyClk(false);
