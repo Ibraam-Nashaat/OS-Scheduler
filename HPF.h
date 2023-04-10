@@ -1,4 +1,3 @@
-#include "headers.h"
 
 struct ProcessStruct * runningProcess;
 bool isRunning;
@@ -14,11 +13,11 @@ void runProcess(struct ProcessStruct *currProcess)
     }
     if(pid==0)
     {
+        childProcessPID=getpid();
          printf("id =  %d started pid = %d current time = %d \n", currProcess->id, getpid(), getClk());
-       
-        int lengthOfRemainingTime = snprintf(NULL, 0, "%d", currProcess->runningTime);
-        char *remainingTime = malloc(lengthOfRemainingTime + 1);
-         char *argv[] = {"./process.out", remainingTime, NULL};
+         char remainigTimeChar[13];
+         sprintf(remainigTimeChar, "%d", currProcess->runningTime);
+         char* argv []={"./process.out",remainigTimeChar,NULL};
          int execlResult = execvp(argv[0], argv);
 
     }
@@ -29,6 +28,8 @@ void terminateProcess(int sigNum)
     isRunning=false;
     free(runningProcess);
     signal(SIGUSR2, terminateProcess);
+    printf("process finished At=%d\n",getClk());
+    fflush(stdout);
 
 
 }
@@ -37,8 +38,7 @@ void HPF(struct PQueue *pqueue)
      struct PQueue *processQueue; // pointer for priorityQueue
     struct ProcessStruct *readyProcess;  //pointer for processes in Pqueue 
     processQueue = pqueue;
-    signal(SIGUSR2,terminateProcess);
-    while (!isEmpty(processQueue) || isRunning) { // while queue isn't empty or runung
+    while (algorithmFlag||!isEmpty(processQueue) || isRunning) { // while queue isn't empty or runung
         if (isEmpty(processQueue)) // queue is empty doesn't make thing
             continue;
         if (!isRunning) {          // isn't running and in Pqueue --> run it
