@@ -7,19 +7,8 @@ struct msgBuff message;
 struct PQueue *priorityQueue;
 struct Queue *queue;
 
-struct ProcessStruct *create_process(int id, int arrivalTime, int priority, int runningTime)
-{
-    struct ProcessStruct *process = (struct ProcessStruct *)malloc(sizeof(struct ProcessStruct));
-    process->id = id;
-    process->arrivalTime = arrivalTime;
-    process->priority = priority;
-    process->runningTime = runningTime;
-    return process;
-}
-
 void pushProcessToSRTN(struct ProcessStruct process)
 {
-    printf("Added Process to SRTN");
     if (process.id != -1)
     {
         struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
@@ -30,7 +19,6 @@ void pushProcessToSRTN(struct ProcessStruct process)
 
 void pushProcessToHPF(struct ProcessStruct process)
 {
-    printf("Added Process to HPF");
     if (process.id != -1)
     {
         struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
@@ -41,7 +29,6 @@ void pushProcessToHPF(struct ProcessStruct process)
 
 void pushProcessToRR(struct ProcessStruct process)
 {
-    printf("Added Process to RR");
     if (process.id != -1)
     {
         struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
@@ -52,10 +39,6 @@ void pushProcessToRR(struct ProcessStruct process)
 
 void getProcess(int signum)
 {
-    printf("ANAAA ZHEEEEEE2TTTTTT\n");
-    printf("%d\n",messageQueueID);
-    fflush(stdout);
-    
     int rec_val = msgrcv(messageQueueID, &message, sizeof(message.process), 5, !IPC_NOWAIT);
 
     printf("Scheduler Received Process with ID=%d\n", message.process.id);
@@ -65,8 +48,7 @@ void getProcess(int signum)
     {
         perror("Error in receiving from msg queue\n");
     }
-    
-    
+
     switch (selectedAlgorithm)
     {
     case 1:
@@ -79,7 +61,7 @@ void getProcess(int signum)
         pushProcessToRR(message.process);
         break;
     }
-    
+
     // Process has been pushed to the queue
     // Up the semaphore to allow process generator to continue
     up(processGeneratorAndSchedulerSemID);
@@ -91,34 +73,6 @@ void getProcess(int signum)
     }
 }
 
-void createMessageQueue(){
-    messageQueueID = msgget(MSQKEY, 0666 | IPC_CREAT);
-
-    if (messageQueueID== -1)
-    {
-        perror("Error in creating message queue\n");
-        exit(-1);
-    }
-}
-
-void createSemaphore(){
-    processGeneratorAndSchedulerSemID= semget(SEMKEY, 1, 0666 | IPC_CREAT);
-    if (processGeneratorAndSchedulerSemID== -1)
-    {
-        perror("Error in creating semaphore\n");
-        exit(-1);
-    }
-    
-
-    union Semun semun;
-    semun.val = 0; /* initial value of the semaphore, Binary semaphore */
-    if (semctl(processGeneratorAndSchedulerSemID, 0, SETVAL, semun) == -1)
-    {
-        perror("Error in semctl\n");
-        exit(-1);
-    }
-}
-
 int main(int argc, char *argv[])
 {
     signal(SIGUSR1, getProcess);
@@ -127,25 +81,32 @@ int main(int argc, char *argv[])
     createMessageQueue();
 
     selectedAlgorithm = atoi(argv[1]);
-    printf("GA3FAR EL 3OMDA %d\n", selectedAlgorithm);
-    fflush(stdout); 
+    printf("Selected Algorithm: %d\n", selectedAlgorithm);
+    fflush(stdout);
 
-    switch (selectedAlgorithm) {
-        case 1:
-            // Allocate the priority queue
-            priorityQueue = createPriorityQueue();
-            while(1){};
-            break;
-        case 2:
-            // Allocate the priority queue
-            priorityQueue = createPriorityQueue();
-            while(1){};
-            break;
-        case 3:
-            // Allocate the queue
-            queue = createQueue();
-            while(1){};
-            break;
+    switch (selectedAlgorithm)
+    {
+    case 1:
+    case 2:
+        // Allocate the priority queue for algorithms 1 and 2
+        priorityQueue = createPriorityQueue();
+        // Enter an infinite loop to process the priority queue
+        while (1)
+        {
+        };
+        break;
+    case 3:
+        // Allocate the queue for algorithm 3
+        queue = createQueue();
+        // Enter an infinite loop to process the queue
+        while (1)
+        {
+        };
+        break;
+    default:
+        // Handle invalid algorithm selection
+        printf("Invalid algorithm selected.\n");
+        break;
     }
 
     destroyClk(false);

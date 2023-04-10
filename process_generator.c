@@ -1,7 +1,12 @@
 #include "headers.h"
+int schedulerPID;
 
-void clearResources(int);
-int schedularPID;
+void clearResources(int signum)
+{
+    msgctl(messageQueueID, IPC_RMID, (struct msqid_ds *) 0);
+    semctl(processGeneratorAndSchedulerSemID, 0, IPC_RMID, (struct semid_ds *) 0);
+}
+
 void readFile(struct Queue* processQueue){
     FILE *file;
     file = fopen("processes.txt", "r");
@@ -14,12 +19,7 @@ void readFile(struct Queue* processQueue){
     }
 
     while(fscanf(file,"%d\t%d\t%d\t%d",&id,&arrivalTime,&runningTime,&priority)!=EOF){
-        struct ProcessStruct* readProcess=(struct ProcessStruct *) malloc(sizeof(struct ProcessStruct));
-        
-        readProcess->id=id;
-        readProcess->arrivalTime=arrivalTime;
-        readProcess->runningTime=runningTime;
-        readProcess->priority=priority;
+        struct ProcessStruct* readProcess = create_process(id, arrivalTime, priority, runningTime);
         enQueue(processQueue,readProcess);
     }
 
@@ -44,34 +44,6 @@ int getSchedulingAlgoFromUser(int* algo){
         scanf("%d",&quantum);
     }
     return quantum;
-}
-
-void createMessageQueue(){
-    messageQueueID = msgget(MSQKEY, 0666 | IPC_CREAT);
-
-    if (messageQueueID== -1)
-    {
-        perror("Error in creating message queue");
-        exit(-1);
-    }
-}
-
-void createSemaphore(){
-    processGeneratorAndSchedulerSemID= semget(SEMKEY, 1, 0666 | IPC_CREAT);
-    if (processGeneratorAndSchedulerSemID== -1)
-    {
-        perror("Error in creating semaphore");
-        exit(-1);
-    }
-    
-
-    union Semun semun;
-    semun.val = 0; /* initial value of the semaphore, Binary semaphore */
-    if (semctl(processGeneratorAndSchedulerSemID, 0, SETVAL, semun) == -1)
-    {
-        perror("Error in semctl");
-        exit(-1);
-    }
 }
 
 void sendProcess(struct ProcessStruct* process){
@@ -104,8 +76,8 @@ int main(int argc, char * argv[])
         execvp(args[0],args);
     }
 
-    schedularPID=fork();
-    if(schedularPID==0){
+    schedulerPID=fork();
+    if(schedulerPID==0){
         char algoAsChar[13],quantumAsChar[13];
         sprintf(algoAsChar,"%d",algo);
         sprintf(quantumAsChar,"%d",quantum);
@@ -128,28 +100,15 @@ int main(int argc, char * argv[])
             clk=getClk();
         }
         printf("Process arrived at arrival time %d and clk %d\n",process->arrivalTime,clk);
-
-        printf("Ba3atna el signal!\n");
         fflush(stdout); 
         sendProcess(process);
-        kill(schedularPID,SIGUSR1);
+        kill(schedulerPID,SIGUSR1);
         down(processGeneratorAndSchedulerSemID);
         deQueue(processQueue);
     }
-    printf("hamada\n");
-    kill(schedularPID,SIGUSR2);
-    waitpid(schedularPID,NULL,0);
+    kill(schedulerPID,SIGUSR2);
+    waitpid(schedulerPID,NULL,0);
 
     destroyClk(true);
-    return 0;
-
-    
+    return 0;    
 }
-
-void clearResources(int signum)
-{
-    //TODO Clears all resources in case of interruption
-    msgctl(messageQueueID, IPC_RMID, (struct msqid_ds *) 0);
-    semctl(processGeneratorAndSchedulerSemID, 0, IPC_RMID, (struct semid_ds *) 0);
-}
-

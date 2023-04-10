@@ -19,14 +19,13 @@ struct Queue {
     struct QNode *front, *rear;
 };
 
-
-//Priority Queue
 struct PQNode {
     struct ProcessStruct* data;
-    // Lower values indicate higher priority
+    // Lower value indicate higher priority
     int priority;
     struct PQNode* next;
 };
+
 struct PQueue {
     struct PQNode *head;
 };
