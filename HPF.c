@@ -1,7 +1,7 @@
 #include "headers.h"
+#include "PQueue.h"
 struct ProcessStruct * runningProcess;
 bool isRunning;
-
 void runProcess(struct ProcessStruct *currProcess)
 {
     isRunning=true;
