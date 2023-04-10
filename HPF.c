@@ -1,10 +1,13 @@
 #include "headers.h"
-#include "PQueue.h"
+#include "headers.h"
+
 struct ProcessStruct * runningProcess;
 bool isRunning;
 void runProcess(struct ProcessStruct *currProcess)
 {
+    runningProcess=currProcess;
     isRunning=true;
+    
     int pid = fork();
     if (pid == -1) {
         perror("Error in execl");
