@@ -15,9 +15,10 @@ void runProcess(struct ProcessStruct *currProcess)
     {
          printf("id =  %d started pid = %d current time = %d \n", currProcess->id, getpid(), getClk());
        
-   // char * remainingTime=currProcess->runningTime;
-   // char *argv[] = {"./process.out", remainingTime, NULL};
-   //      int execlResult = execvp(argv[0], argv);
+        int lengthOfRemainingTime = snprintf(NULL, 0, "%d", currProcess->runningTime);
+        char *remainingTime = malloc(lengthOfRemainingTime + 1);
+         char *argv[] = {"./process.out", remainingTime, NULL};
+         int execlResult = execvp(argv[0], argv);
 
     }
 }
@@ -35,7 +36,7 @@ void HPF(struct PQueue *pqueue)
      struct PQueue *processQueue; // pointer for priorityQueue
     struct ProcessStruct *readyProcess;  //pointer for processes in Pqueue 
     processQueue = pqueue;
-    
+    signal(SIGUSR2,terminateProcess);
     while (!isEmpty(processQueue) || isRunning) { // while queue isn't empty or runung
         if (isEmpty(processQueue)) // queue is empty doesn't make thing
             continue;
@@ -45,7 +46,6 @@ void HPF(struct PQueue *pqueue)
             runningProcess=readyProcess;
             runProcess(readyProcess);
 
-//signal(SIGUSR2,terminateProcess)
         }
     }
 
