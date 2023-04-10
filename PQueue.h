@@ -22,21 +22,18 @@ struct ProcessStruct* p = peek(q);
 
 */
 
-
-
-
 // Function to create an empty queue
-struct PQueue* createPriorityQueue()
+struct PQueue *createPriorityQueue()
 {
-    struct PQueue* q = (struct PQueue*)malloc(sizeof(struct PQueue));
+    struct PQueue *q = (struct PQueue *)malloc(sizeof(struct PQueue));
     q->head = NULL;
     return q;
 }
 
 // Function to create a new node
-struct PQNode* newNode(struct ProcessStruct* d, int p)
+struct PQNode *newNode(struct ProcessStruct *d, int p)
 {
-    struct PQNode* temp = (struct PQNode*)malloc(sizeof(struct PQNode));
+    struct PQNode *temp = (struct PQNode *)malloc(sizeof(struct PQNode));
     temp->data = d;
     temp->priority = p;
     temp->next = NULL;
@@ -44,30 +41,33 @@ struct PQNode* newNode(struct ProcessStruct* d, int p)
 }
 
 // Return the value at head
-struct ProcessStruct* peek(struct PQueue* q)
+struct ProcessStruct *peek(struct PQueue *q)
 {
     return q->head->data;
 }
 
 // Removes the element with the
 // highest priority form the list
-void pop(struct PQueue* q)
+void pop(struct PQueue *q)
 {
-    struct PQNode* temp = q->head;
+    struct PQNode *temp = q->head;
     q->head = q->head->next;
     free(temp);
 }
 
 // Function to push according to priority
-void push(struct PQueue* q, struct ProcessStruct* d, int p)
+void push(struct PQueue *q, struct ProcessStruct *d, int p)
 {
-    struct PQNode* start = q->head;
+    struct PQNode *start = q->head;
     // Create new Node
-    struct PQNode* temp = newNode(d, p);
+    struct PQNode *temp = newNode(d, p);
 
-    if (start == NULL) {
+    if (start == NULL)
+    {
         q->head = temp;
-    } else {
+    }
+    else
+    {
         // Special Case: The head of list has
         // lesser priority than new node. So
         // insert newnode before head node
@@ -95,7 +95,7 @@ void push(struct PQueue* q, struct ProcessStruct* d, int p)
 }
 
 // Function to check is list is empty
-bool isEmpty(struct PQueue* q)
+bool isEmpty(struct PQueue *q)
 {
     return q->head == NULL;
 }
