@@ -1,5 +1,4 @@
 #include "headers.h"
-#include "headers.h"
 
 struct ProcessStruct * runningProcess;
 bool isRunning;
