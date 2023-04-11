@@ -11,7 +11,7 @@ struct msgBuff
     long mtype;
     struct ProcessStruct process;
 };
-
+/*
 struct QNode
 {
     struct ProcessStruct *data;
@@ -21,9 +21,9 @@ struct QNode
 struct Queue
 {
     struct QNode *front, *rear;
-};
+};*/
 
-struct PQNode
+/*struct PQNode
 {
     struct ProcessStruct *data;
     // Lower value indicate higher priority
@@ -34,4 +34,4 @@ struct PQNode
 struct PQueue
 {
     struct PQNode *head;
-};
+};*/

@@ -1,11 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include"stdbool.h"
 #define NULL ((void *)0)
 
 struct PQNode
 {
-    int data; // data of Node
+    struct ProcessStruct* data; // data of Node
     struct PQNode * next;  // pointer for next Node
     int priority;
 };
@@ -15,16 +12,16 @@ struct PQueue
     struct PQNode * head ,* tail;
 };
 
-struct PQNode* newPQNode(int val ,int priority)
+struct PQNode* newPQNode(struct ProcessStruct* process ,int priority)
 {
     struct PQNode * temp=(struct PQNode*)malloc(sizeof(struct PQNode));
-    temp->data=val;
+    temp->data=process;
     temp->next=NULL;
     temp->priority=priority;
     return temp;
 }
 
-struct PQueue* createPQueue()
+struct PQueue* createPriorityQueue()
 {
     struct PQueue* pq=(struct PQueue*)malloc(sizeof(struct PQueue));
    //Intialize queue
@@ -32,16 +29,16 @@ struct PQueue* createPQueue()
     pq->tail=NULL;
     return pq;
 };
-bool pq_isEmpty(struct PQueue * pq) {
+bool isEmpty(struct PQueue * pq) {
     return (pq->head == NULL);
 }
 
 
 // enQueue method-> add node to Queue
-void enPQueue(struct PQueue* pq,int val, int priority)
+void push(struct PQueue* pq,struct ProcessStruct* process, int priority)
 {
     struct PQNode* PQnodehead= pq->head;
-struct PQNode* nNode=newPQNode(val,priority);
+struct PQNode* nNode=newPQNode(process,priority);
 //codition if queue is empty
 if(pq->head==NULL)
 {
@@ -67,26 +64,21 @@ else
 }
 
 //deQueue method-> remove node from queue and store its data in variable
-int dePQueue(struct PQueue* pq)
+struct ProcessStruct* pop (struct PQueue* pq)
 {
-    int val=-1;
+    struct ProcessStruct* process=NULL;
     if(pq->head==NULL)
     {
-        printf("PQueue is empty\n");
-        return val;
+        return process;
     }
 struct PQNode* temp=pq->head;
 pq->head= pq->head->next;
-if(pq->head==NULL)
-{
- printf("Queue becomes empty\n");
-}
-val =temp->data;
+process =temp->data;
 free(temp);
-return val;
+return process;
 }
-int peek(struct PQueue* pq) {
-    if (pq_isEmpty(pq))
-        return 0;
+struct ProcessStruct* peek(struct PQueue* pq) {
+    if (isEmpty(pq))
+        return NULL;
     return pq->head->data;
 }

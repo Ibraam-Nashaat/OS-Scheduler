@@ -1,13 +1,13 @@
 struct Queue* testReadFile(struct Queue* queue){
 struct Queue* tempQueue=createQueue();
-while(!isEmptyN(queue)){
-    struct ProcessStruct* process=peekN(queue);
+while(!isEmptyQueue(queue)){
+    struct ProcessStruct* process=dequeue(queue);;
     printf("%d\t%d\t%d\t%d\n",process->id,
                             process->arrivalTime,
                             process->runningTime,
                             process->priority);
-    enQueue(tempQueue,process);
-    deQueue(queue);
+    enqueue(tempQueue,process);
+    
     
 }
 return tempQueue;

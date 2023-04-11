@@ -22,7 +22,7 @@ void readFile(struct Queue *processQueue)
     while (fscanf(file, "%d\t%d\t%d\t%d", &id, &arrivalTime, &runningTime, &priority) != EOF)
     {
         struct ProcessStruct *readProcess = create_process(id, arrivalTime, priority, runningTime);
-        enQueue(processQueue, readProcess);
+        enqueue(processQueue, readProcess);
     }
 
     // processQueue=testReadFile(processQueue);
@@ -101,9 +101,9 @@ int main(int argc, char *argv[])
     //  6. Send the information to the scheduler at the appropriate time.
     //  7. Clear clock resources
     int clk;
-    while (!isEmptyN(processQueue))
+    while (!isEmptyQueue(processQueue))
     {
-        struct ProcessStruct *process = peekN(processQueue);
+        struct ProcessStruct *process = dequeue(processQueue);
         clk = getClk();
         while (process->arrivalTime > clk)
         {
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
         sendProcess(process);
         kill(schedulerPID, SIGUSR1);
         down(processGeneratorAndSchedulerSemID);
-        deQueue(processQueue);
+        
     }
     kill(schedulerPID, SIGRTMIN);
     waitpid(schedulerPID, NULL, 0);

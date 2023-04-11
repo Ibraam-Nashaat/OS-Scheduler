@@ -1,11 +1,7 @@
-#include"stdlib.h"
-#include "stddef.h"
-#include"stdbool.h"
-#include <stdio.h>
 #define NULL ((void *)0)
 struct Node
 {
-    int data; // data of Node
+    struct ProcessStruct*  data; // data of Node
     struct Node * next;  // pointer for next Node
 };
 //Queue Struct
@@ -23,16 +19,16 @@ struct Queue* createQueue()
     return q;
 };
 // intailiaze new node 
-struct Node* newNode(int val )
+struct Node* newQueueNode(struct ProcessStruct* process )
 {
     struct Node * temp=(struct Node*)malloc(sizeof(struct Node));
-    temp->data=val;
+    temp->data=process;
     temp->next=NULL;
     return temp;
 }
 
 // IsEmpty methodknown by head pointer
-bool isEmpty(struct Queue* q)
+bool isEmptyQueue(struct Queue* q)
 {
      if( q->head == NULL)
      {
@@ -42,9 +38,9 @@ bool isEmpty(struct Queue* q)
 }
 
 // enQueue method-> add node to Queue
-void enQueue(struct Queue* q,int val)
+void enqueue(struct Queue* q,struct ProcessStruct*process)
 {
-struct Node* nNode=newNode(val);
+struct Node* nNode=newQueueNode(process);
 //codition if queue is empty
 if(q->head==NULL)
 {
@@ -60,22 +56,17 @@ else
 }
 }
 //deQueue method-> remove node from queue and store its data in variable
-int deQueue(struct Queue* q)
+struct ProcessStruct* dequeue(struct Queue* q)
 {
-    int val=-1;
+    struct ProcessStruct* process=NULL;
     if(q->head==NULL)
     {
-        printf("Queue is empty\n");
-        return val;
+        return process;
     }
 struct Node* temp=q->head;
 q->head=q->head->next;
-if(q->head==NULL)
-{
- printf("Queue becomes empty\n");
-}
-val =temp->data;
+process =temp->data;
 free(temp);
-return val;
+return process;
 }
 
