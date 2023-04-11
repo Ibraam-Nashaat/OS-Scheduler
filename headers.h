@@ -21,9 +21,10 @@ typedef short bool;
 #define SEMKEY 70
 
 #include "structs.h"
-#include "Queue.h"
 #include "PQueue.h"
+#include "Queue.h"
 #include "process_generator_tester.h"
+
 
 int messageQueueID;
 int processGeneratorAndSchedulerSemID; // The ID of the semaphore between process generator and scheduler

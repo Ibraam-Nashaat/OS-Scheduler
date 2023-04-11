@@ -36,7 +36,7 @@ void pushProcessToRR(struct ProcessStruct process)
     {
         struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
                                                           process.runningTime);
-        enQueue(queue, newProcess);
+        enqueue(queue, newProcess);
     }
 }
 
