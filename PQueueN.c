@@ -56,7 +56,7 @@ else
         pq->head=nNode;
 
     }
-    else if (priority > PQnodehead->priority)
+    else if (priority > PQnodehead->priority)// if not try to rearrange itself 
     {
          while ((PQnodehead->next != NULL) && (PQnodehead->next->priority <= priority))
             PQnodehead = PQnodehead->next;

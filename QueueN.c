@@ -3,7 +3,6 @@
 #include"stdbool.h"
 #include <stdio.h>
 #define NULL ((void *)0)
-
 struct Node
 {
     int data; // data of Node
@@ -14,7 +13,7 @@ struct Queue
 {
     struct Node * head ,* tail;
 };
-
+// create queue 
 struct Queue* createQueue()
 {
     struct Queue* q=(struct Queue*)malloc(sizeof(struct Queue));
@@ -23,6 +22,7 @@ struct Queue* createQueue()
     q->tail=NULL;
     return q;
 };
+// intailiaze new node 
 struct Node* newNode(int val )
 {
     struct Node * temp=(struct Node*)malloc(sizeof(struct Node));
@@ -31,7 +31,7 @@ struct Node* newNode(int val )
     return temp;
 }
 
-// IsEmpty method
+// IsEmpty methodknown by head pointer
 bool isEmpty(struct Queue* q)
 {
      if( q->head == NULL)
