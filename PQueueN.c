@@ -84,7 +84,7 @@ val =temp->data;
 free(temp);
 return val;
 }
-int pq_peek(struct PQueue* pq) {
+int peek(struct PQueue* pq) {
     if (pq_isEmpty(pq))
         return 0;
     return pq->head->data;
