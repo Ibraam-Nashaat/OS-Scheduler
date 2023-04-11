@@ -21,10 +21,8 @@ typedef short bool;
 #define SEMKEY 70
 
 #include "structs.h"
-//#include "Queue.h"
-//#include "PQueue.h"
-#include "PQueueN.h"
-#include "QueueN.h"
+#include "PQueue.h"
+#include "Queue.h"
 #include "process_generator_tester.h"
 
 

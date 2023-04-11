@@ -11,27 +11,25 @@ struct msgBuff
     long mtype;
     struct ProcessStruct process;
 };
-/*
-struct QNode
+struct PQNode
 {
-    struct ProcessStruct *data;
-    struct QNode *next;
-};
-
-struct Queue
-{
-    struct QNode *front, *rear;
-};*/
-
-/*struct PQNode
-{
-    struct ProcessStruct *data;
-    // Lower value indicate higher priority
+    struct ProcessStruct* data; // data of Node
+    struct PQNode * next;  // pointer for next Node
     int priority;
-    struct PQNode *next;
 };
-
+//Queue Struct
 struct PQueue
 {
-    struct PQNode *head;
-};*/
+    struct PQNode * head ,* tail;
+};
+
+struct Node
+{
+    struct ProcessStruct*  data; // data of Node
+    struct Node * next;  // pointer for next Node
+};
+//Queue Struct
+struct Queue
+{
+    struct Node * head ,* tail;
+};

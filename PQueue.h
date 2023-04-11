@@ -1,101 +1,74 @@
-/*
-HOW TO USE:
-===========
+#define NULL ((void *)0)
 
-struct ProcessStruct* p1 = (struct ProcessStruct*)malloc(sizeof(struct ProcessStruct));
 
-*create the queue and insert elements in it
-===========================================
-struct PQueue* q = createPriorityQueue();
-push(q, p1, 1);
-            priority
 
-*check if the queue is empty
-============================
-isEmpty(q)
-
-*get the first element in the queue
-===================================
-struct ProcessStruct* p = peek(q);
-
-*** don't forget to call pop(q) after finish playing with (p)
-
-*/
-
-// Function to create an empty queue
-struct PQueue *createPriorityQueue()
+struct PQNode* newPQNode(struct ProcessStruct* process ,int priority)
 {
-    struct PQueue *q = (struct PQueue *)malloc(sizeof(struct PQueue));
-    q->head = NULL;
-    return q;
-}
-
-// Function to create a new node
-struct PQNode *newNode(struct ProcessStruct *d, int p)
-{
-    struct PQNode *temp = (struct PQNode *)malloc(sizeof(struct PQNode));
-    temp->data = d;
-    temp->priority = p;
-    temp->next = NULL;
+    struct PQNode * temp=(struct PQNode*)malloc(sizeof(struct PQNode));
+    temp->data=process;
+    temp->next=NULL;
+    temp->priority=priority;
     return temp;
 }
 
-// Return the value at head
-struct ProcessStruct *peek(struct PQueue *q)
+struct PQueue* createPriorityQueue()
 {
-    return q->head->data;
+    struct PQueue* pq=(struct PQueue*)malloc(sizeof(struct PQueue));
+   //Intialize queue
+    pq->head=NULL;
+    pq->tail=NULL;
+    return pq;
+};
+bool isEmptyPQ(struct PQueue * pq) {
+    return (pq->head == NULL);
 }
 
-// Removes the element with the
-// highest priority form the list
-void pop(struct PQueue *q)
+
+// enQueue method-> add node to Queue
+void push(struct PQueue* pq,struct ProcessStruct* process, int priority)
 {
-    struct PQNode *temp = q->head;
-    q->head = q->head->next;
-    free(temp);
+    struct PQNode* PQnodehead= pq->head;
+struct PQNode* nNode=newPQNode(process,priority);
+//codition if queue is empty
+if(pq->head==NULL)
+{
+    pq->tail=pq->head=nNode;
+    return;
 }
-
-// Function to push according to priority
-void push(struct PQueue *q, struct ProcessStruct *d, int p)
+else
 {
-    struct PQNode *start = q->head;
-    // Create new Node
-    struct PQNode *temp = newNode(d, p);
-
-    if (start == NULL)
+    if (priority <= PQnodehead->priority )// LOW priority first
     {
-        q->head = temp;
+        nNode->next=PQnodehead;
+        pq->head=nNode;
+
     }
-    else
+    else if (priority > PQnodehead->priority)// if not try to rearrange itself 
     {
-        // Special Case: The head of list has
-        // lesser priority than new node. So
-        // insert newnode before head node
-        // and change head node.
-        if (q->head->priority > p)
-        {
-            // Insert New Node before head
-            temp->next = q->head;
-            q->head = temp;
-        }
-        else
-        {
-            // Traverse the list and find a
-            // position to insert new node
-            while (start->next != NULL && start->next->priority <= p)
-            {
-                start = start->next;
-            }
-            // Either at the ends of the list
-            // or at required position
-            temp->next = start->next;
-            start->next = temp;
-        }
+         while ((PQnodehead->next != NULL) && (PQnodehead->next->priority <= priority))
+            PQnodehead = PQnodehead->next;
+       nNode->next = PQnodehead->next;
+        PQnodehead->next = nNode;
     }
 }
+}
 
-// Function to check is list is empty
-bool isEmpty(struct PQueue *q)
+//deQueue method-> remove node from queue and store its data in variable
+struct ProcessStruct* pop (struct PQueue* pq)
 {
-    return q->head == NULL;
+    struct ProcessStruct* process=NULL;
+    if(pq->head==NULL)
+    {
+        return process;
+    }
+struct PQNode* temp=pq->head;
+pq->head= pq->head->next;
+process =temp->data;
+free(temp);
+return process;
+}
+struct ProcessStruct* peek(struct PQueue* pq) {
+    if (isEmptyPQ(pq))
+        return NULL;
+    return pq->head->data;
 }

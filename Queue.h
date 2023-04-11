@@ -1,88 +1,63 @@
-/*
-HOW TO USE:
-===========
+#define NULL ((void *)0)
 
-struct ProcessStruct* p1 = (struct ProcessStruct*)malloc(sizeof(struct ProcessStruct));
-
-*create the queue and insert elements in it
-===========================================
-struct Queue* q = createQueue();
-enQueue (q, p1);
-
-*check if the queue is empty
-============================
-isEmptyN(q)
-
-*get the first element in the queue
-===================================
-struct ProcessStruct* p = peekN(q);
-
-*** don't forget to call deQueue(q) after finish playing with (p)
-
-*/
-
-// Function to create an empty queue
-struct Queue *createQueue()
+// create queue 
+struct Queue* createQueue()
 {
-    struct Queue *q = (struct Queue *)malloc(sizeof(struct Queue));
-    q->front = q->rear = NULL;
+    struct Queue* q=(struct Queue*)malloc(sizeof(struct Queue));
+   //Intialize queue
+    q->head=NULL;
+    q->tail=NULL;
     return q;
-}
-
-// Function to create a new linked list node.
-struct QNode *newNNode(struct ProcessStruct *d)
+};
+// intailiaze new node 
+struct Node* newQueueNode(struct ProcessStruct* process )
 {
-    struct QNode *temp = (struct QNode *)malloc(sizeof(struct QNode));
-    temp->data = d;
-    temp->next = NULL;
+    struct Node * temp=(struct Node*)malloc(sizeof(struct Node));
+    temp->data=process;
+    temp->next=NULL;
     return temp;
 }
 
-// The function to add a key k to q
-void enQueue(struct Queue *q, struct ProcessStruct *d)
+// isEmptyPQ methodknown by head pointer
+bool isEmptyQueue(struct Queue* q)
 {
-    // Create a new LL node
-    struct QNode *temp = newNNode(d);
+     if( q->head == NULL)
+     {
+     return true;
+     }
+     else return false;
+}
 
-    // If queue is empty, then new node is front and rear both
-    if (q->rear == NULL)
+// enQueue method-> add node to Queue
+void enqueue(struct Queue* q,struct ProcessStruct*process)
+{
+struct Node* nNode=newQueueNode(process);
+//codition if queue is empty
+if(q->head==NULL)
+{
+    q->tail=q->head=nNode;
+    return;
+}
+else
+{
+    // if queue isn't empty make Next Pointer of tail implies to newNode
+    q->tail->next=nNode;
+    // move tail pointer to newNode
+    q->tail=nNode;
+}
+}
+//deQueue method-> remove node from queue and store its data in variable
+struct ProcessStruct* dequeue(struct Queue* q)
+{
+    struct ProcessStruct* process=NULL;
+    if(q->head==NULL)
     {
-        q->front = q->rear = temp;
-        return;
+        return process;
     }
-
-    // Add the new node at the end of queue and change rear
-    q->rear->next = temp;
-    q->rear = temp;
+struct Node* temp=q->head;
+q->head=q->head->next;
+process =temp->data;
+free(temp);
+return process;
 }
 
-// Return the value at head
-struct ProcessStruct *peekN(struct Queue *q)
-{
-    return q->front->data;
-}
-
-// Function to remove a key from given queue q
-void deQueue(struct Queue *q)
-{
-    // If queue is empty, return.
-    if (q->front == NULL)
-        return;
-
-    // Store previous front and move front one node ahead
-    struct QNode *temp = q->front;
-
-    q->front = q->front->next;
-
-    // If front becomes NULL, then change rear also as NULL
-    if (q->front == NULL)
-        q->rear = NULL;
-
-    free(temp);
-}
-
-// Function to check is list is empty
-bool isEmptyN(struct Queue *q)
-{
-    return q->front == NULL;
-}
