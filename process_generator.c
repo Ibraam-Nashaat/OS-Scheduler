@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
         down(processGeneratorAndSchedulerSemID);
         deQueue(processQueue);
     }
-    kill(schedulerPID, SIGUSR2);
+    kill(schedulerPID, SIGRTMIN);
     waitpid(schedulerPID, NULL, 0);
 
     destroyClk(true);

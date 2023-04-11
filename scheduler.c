@@ -1,6 +1,9 @@
 #include "headers.h"
+int algorithmFlag = 1;
+int childProcessPID;
+#include "HPF.h"
 
-int flag = 1;
+
 int selectedAlgorithm;
 
 struct msgBuff message;
@@ -69,13 +72,19 @@ void getProcess(int signum)
     // check if that process was the terminating one (id = -1)
     if (message.process.id == -1)
     {
-        flag = 0;
+        algorithmFlag = 0;
     }
+}
+void changeAlgorithmFlag(int sigNum){
+    algorithmFlag=0;
+    fflush(stdout);
 }
 
 int main(int argc, char *argv[])
 {
     signal(SIGUSR1, getProcess);
+    signal(SIGRTMIN,changeAlgorithmFlag);
+    signal(SIGUSR2,terminateProcess);
     initClk();
     createSemaphore();
     createMessageQueue();
@@ -87,6 +96,10 @@ int main(int argc, char *argv[])
     switch (selectedAlgorithm)
     {
     case 1:
+        priorityQueue = createPriorityQueue();
+        // Enter an infinite loop to process the priority queue
+        HPF(priorityQueue);
+        break;
     case 2:
         // Allocate the priority queue for algorithms 1 and 2
         priorityQueue = createPriorityQueue();
