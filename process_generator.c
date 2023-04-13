@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
         fflush(stdout);
         sendProcess(process);
         kill(schedulerPID, SIGUSR1);
-        down(processGeneratorAndSchedulerSemID);
+        semaphoreDown(processGeneratorAndSchedulerSemID);
     }
     kill(schedulerPID, SIGRTMIN);
     waitpid(schedulerPID, NULL, 0);

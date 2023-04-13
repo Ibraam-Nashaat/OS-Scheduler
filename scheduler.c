@@ -66,8 +66,8 @@ void getProcess(int signum)
     }
 
     // Process has been pushed to the queue
-    // Up the semaphore to allow process generator to continue
-    up(processGeneratorAndSchedulerSemID);
+    // semaphoreUp the semaphore to allow process generator to continue
+    semaphoreUp(processGeneratorAndSchedulerSemID);
 
     // check if that process was the terminating one (id = -1)
     if (message.process.id == -1)
