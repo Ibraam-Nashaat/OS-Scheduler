@@ -19,7 +19,6 @@ void runProcess(struct ProcessStruct *currProcess)
          sprintf(remainigTimeChar, "%d", currProcess->runningTime);
          char* argv []={"./process.out",remainigTimeChar,NULL};
          int execlResult = execvp(argv[0], argv);
-
     }
 }
 //terminate process ->make isRunning false and free process
@@ -27,7 +26,7 @@ void terminateProcess(int sigNum)
 {
     isRunning=false;
     free(runningProcess);
-    signal(SIGUSR2, terminateProcess);
+    //signal(SIGUSR2, terminateProcess);
     printf("process finished At=%d\n",getClk());
     fflush(stdout);
 
@@ -35,7 +34,7 @@ void terminateProcess(int sigNum)
 }
 void HPF(struct PQueue *pqueue)
 {
-     struct PQueue *processQueue; // pointer for priorityQueue
+    struct PQueue *processQueue; // pointer for priorityQueue
     struct ProcessStruct *readyProcess;  //pointer for processes in Pqueue 
     processQueue = pqueue;
     while (algorithmFlag||!isEmptyPQ(processQueue) || isRunning) { // while queue isn't empty or runung
@@ -46,7 +45,6 @@ void HPF(struct PQueue *pqueue)
             pop(processQueue);
             runningProcess=readyProcess;
             runProcess(readyProcess);
-
         }
     }
 

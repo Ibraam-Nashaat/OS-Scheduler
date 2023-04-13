@@ -2,10 +2,10 @@
 int algorithmFlag = 1;
 int childProcessPID;
 #include "HPF.h"
-
+#include "RR.h"
+#include "SRTN.h"
 
 int selectedAlgorithm;
-
 struct msgBuff message;
 struct PQueue *priorityQueue;
 struct Queue *queue;
@@ -16,7 +16,7 @@ void pushProcessToSRTN(struct ProcessStruct process)
     {
         struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
                                                           process.runningTime);
-        push(priorityQueue, newProcess, newProcess->runningTime);
+        push(priorityQueue, newProcess, newProcess->remainingTime);
     }
 }
 
@@ -85,6 +85,11 @@ int main(int argc, char *argv[])
     signal(SIGUSR1, getProcess);
     signal(SIGRTMIN,changeAlgorithmFlag);
     signal(SIGUSR2,terminateProcess);
+    signal(SIGBUS,terminateProcessRR);
+    signal(SIGURG,BlockProcessRR);
+    signal(SIGIO, terminateProcessSRTN);
+    signal(SIGIOT, BlockProcessSRTN);
+
     initClk();
     createSemaphore();
     createMessageQueue();
@@ -104,17 +109,14 @@ int main(int argc, char *argv[])
         // Allocate the priority queue for algorithms 1 and 2
         priorityQueue = createPriorityQueue();
         // Enter an infinite loop to process the priority queue
-        while (1)
-        {
-        };
+        SRTN(priorityQueue);
         break;
     case 3:
         // Allocate the queue for algorithm 3
         queue = createQueue();
+        int quantum = atoi(argv[2]);
         // Enter an infinite loop to process the queue
-        while (1)
-        {
-        };
+        RR(queue,quantum);
         break;
     default:
         // Handle invalid algorithm selection

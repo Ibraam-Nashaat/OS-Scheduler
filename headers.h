@@ -174,5 +174,6 @@ struct ProcessStruct *create_process(int id, int arrivalTime, int priority, int 
     process->arrivalTime = arrivalTime;
     process->priority = priority;
     process->runningTime = runningTime;
+    process->remainingTime = runningTime;
     return process;
 }

@@ -1,9 +1,10 @@
 struct ProcessStruct
 {
     int id,
-        arrivalTime,
-        priority,
-        runningTime;
+    arrivalTime,
+    priority,
+    runningTime,
+    remainingTime;
 };
 
 struct msgBuff

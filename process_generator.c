@@ -92,7 +92,6 @@ int main(int argc, char *argv[])
         char *args[] = {"./scheduler.out", algoAsChar, quantumAsChar, NULL};
         execvp(args[0], args);
     }
-
     // 4. Use this function after creating the clock process to initialize clock
     initClk();
     // printf("current time is %d\n", x);
@@ -114,7 +113,6 @@ int main(int argc, char *argv[])
         sendProcess(process);
         kill(schedulerPID, SIGUSR1);
         down(processGeneratorAndSchedulerSemID);
-        
     }
     kill(schedulerPID, SIGRTMIN);
     waitpid(schedulerPID, NULL, 0);
