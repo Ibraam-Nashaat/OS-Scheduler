@@ -1,5 +1,6 @@
 void SRTN(struct PQueue *pQueue)
 {
+    
     struct ProcessStruct *readyProcess;  //pointer for processes in Pqueue 
     priorityQueue = pQueue;
     quantum = 1;
