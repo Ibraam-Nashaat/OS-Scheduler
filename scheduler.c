@@ -54,6 +54,8 @@ void getProcess(int signum)
         break;
     case 2:
         pushProcessToSRTN(message.process);
+        if(isRunning && peek(priorityQueue)->runningTime < runningProcess->remainingTime)
+            blockProcess();
         break;
     case 3:
         pushProcessToRR(message.process);
@@ -72,15 +74,14 @@ void getProcess(int signum)
 }
 void changeAlgorithmFlag(int sigNum){
     algorithmFlag=0;
-    fflush(stdout);
 }
 
 int main(int argc, char *argv[])
 {
     signal(SIGUSR1, getProcess);
     signal(SIGRTMIN,changeAlgorithmFlag);
-    signal(SIGALRM,terminateProcess);
-    signal(SIGUSR2, processMadeOneClk);
+    signal(SIGUSR2,terminateProcess);
+    signal(SIGRTMIN+1, processMadeOneClk);
 
     initClk();
     createSemaphore();

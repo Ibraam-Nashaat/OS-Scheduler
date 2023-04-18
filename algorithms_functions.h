@@ -47,6 +47,7 @@ void runProcess(struct ProcessStruct *currProcess)
     {
         childProcessPID=getpid();
         printf("process %d at time %d\n", runningProcess->id, getClk());
+        fflush(stdout);
         char remainigTimeChar[13];
         sprintf(remainigTimeChar, "%d", currProcess->remainingTime);
         char* argv []={"./process.out",remainigTimeChar,NULL}; // send remaining time as an argument
@@ -65,8 +66,8 @@ void terminateProcess(int sigNum)
     free(runningProcess);
     runningProcess = NULL;
     isRunning=false;
-    signal(SIGALRM, terminateProcess);
-    //printf("algo flad %d , isemptyQ %d , isRunning %d\n", algorithmFlag, !isEmptyPQ(priorityQueue), isRunning);
+    //signal(SIGALRM, terminateProcess);
+  //  printf("algo flag %d , isemptyQ %d , isRunning %d\n", algorithmFlag, isEmptyPQ(priorityQueue), isRunning);
     fflush(stdout);
 }
 /*
@@ -74,6 +75,7 @@ This function blocks the process, put it at the end of the queue and make isRunn
 */
 void blockProcess()
 {
+    kill(runningProcess->pid,SIGSTOP);
     if(selectedAlgorithm == 3)
         {            
             enqueue(queue,runningProcess);
@@ -94,14 +96,26 @@ This function decrement the currQuantum and remainingTime of the process and do 
 */
 void processMadeOneClk(int sigNum)
 {
-    signal(SIGUSR2,processMadeOneClk);
+    //signal(SIGUSR2,processMadeOneClk);
     runningProcess->remainingTime--;
-    currQuantum--;
+  /*  currQuantum--;
+    printf("Hi from algoFun my remaining time is %d\n",runningProcess->remainingTime);
+    fflush(stdout);
 
-    //printf("remaining time %d\n",runningProcess->remainingTime);
-    if(!runningProcess->remainingTime){
-        // nothing to do
-        kill(runningProcess->pid,SIGCONT);
+    if(selectedAlgorithm==1 || !runningProcess->remainingTime) {
+         kill(runningProcess->pid,SIGCONT);
+         return;
+    }
+    if(selectedAlgorithm == 2){
+
+        if(!isEmptyPQ(priorityQueue) && peek(priorityQueue)->runningTime < runningProcess->remainingTime) // in case SRTN
+            blockProcess();
+        else 
+        {
+            printf("Process %d was here\n",runningProcess->pid);
+            fflush(stdout);
+            kill(runningProcess->pid,SIGCONT);
+        }
     }
     else if (!currQuantum){ // in case RR
         if(!isEmptyQueue(queue))
@@ -113,12 +127,9 @@ void processMadeOneClk(int sigNum)
                 currQuantum=quantum;
                 kill(runningProcess->pid,SIGCONT);
             }        
-    }
-    else if(selectedAlgorithm == 2 && !isEmptyPQ(priorityQueue) && 
-     peek(priorityQueue)->runningTime < runningProcess->remainingTime) // in case SRTN
-        blockProcess();
-    else
-    {
-        kill(runningProcess->pid,SIGCONT);
-    }    
+    } 
+    printf("hey from selected Algo %d\n",selectedAlgorithm);
+    printf("bye from algoFun and pid of running process %d\n",runningProcess->pid);
+    fflush(stdout);
+    */
 }
