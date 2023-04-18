@@ -4,7 +4,11 @@ struct ProcessStruct
     arrivalTime,
     priority,
     runningTime,
-    remainingTime;
+    remainingTime,
+    startTime,
+    waitingTime,
+    lastStartedTime,
+    pid;
 };
 
 struct msgBuff
