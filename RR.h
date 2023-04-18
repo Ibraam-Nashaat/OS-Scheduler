@@ -11,7 +11,6 @@ void RR(struct Queue *q, int quant)
             }
         if (!isRunning) {          // isn't running and in Pqueue --> run it
             readyProcess = dequeue(queue);
-            //pop(queue);
             currQuantum = quantum;
             runningProcess=readyProcess;
             runProcess(readyProcess);

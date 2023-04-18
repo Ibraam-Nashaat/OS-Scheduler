@@ -31,7 +31,7 @@ void runProcess(struct ProcessStruct *currProcess)
     //runningProcess->lastStartedTime = getClk();
     if(runningProcess->pid != -1) // if the process started before , send SIGCONT to make it continue its execution
     {
-        printf("Process with id %d continued, clk %d\n", runningProcess->id, getClk());
+        printf("Process with id %d and pid %d continued, clk %d\n", runningProcess->id,runningProcess->pid, getClk());
         kill(runningProcess->pid,SIGCONT);
         previous_id = runningProcess->id;
         return;
@@ -94,4 +94,19 @@ This function decrement the currQuantum and remainingTime of the process and do 
 void processMadeOneClk(int sigNum)
 {
     runningProcess->remainingTime--;
+    if(selectedAlgorithm==3){
+        currQuantum--;
+        if (!currQuantum && runningProcess->remainingTime){ // in case RR
+            if(!isEmptyQueue(queue)) 
+            {
+                blockProcess();
+            }
+            else
+                {
+                    printf("hi\n");
+                    currQuantum=quantum;
+                    kill(runningProcess->pid,SIGCONT);
+                }        
+        } 
+    }
 }

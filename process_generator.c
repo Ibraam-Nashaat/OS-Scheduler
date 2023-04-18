@@ -63,6 +63,7 @@ void sendProcess(struct ProcessStruct *process)
 
 int main(int argc, char *argv[])
 {
+    
     signal(SIGINT, clearResources);
     // TODO Initialization
     // 1. Read the input files.
