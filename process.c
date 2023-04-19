@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
         if (currentTime != previousTime )
             {
                 remainingTime--;
-                printf("remaining time %d at clk %d\n",remainingTime,getClk());
                 kill(getppid(), SIGRTMIN+1);
                 currentTime = getClk();
             }

@@ -103,7 +103,6 @@ void processMadeOneClk(int sigNum)
             }
             else
                 {
-                    printf("hi\n");
                     currQuantum=quantum;
                     kill(runningProcess->pid,SIGCONT);
                 }        
