@@ -1,14 +1,9 @@
 #include "headers.h"
-int algorithmFlag = 1;
-int childProcessPID;
+#include "algorithms_functions.h"
 #include "HPF.h"
 #include "RR.h"
 #include "SRTN.h"
 
-int selectedAlgorithm;
-struct msgBuff message;
-struct PQueue *priorityQueue;
-struct Queue *queue;
 
 void pushProcessToSRTN(struct ProcessStruct process)
 {
@@ -66,8 +61,8 @@ void getProcess(int signum)
     }
 
     // Process has been pushed to the queue
-    // semaphoreUp the semaphore to allow process generator to continue
-    semaphoreUp(processGeneratorAndSchedulerSemID);
+    // Up the semaphore to allow process generator to continue
+    up(processGeneratorAndSchedulerSemID);
 
     // check if that process was the terminating one (id = -1)
     if (message.process.id == -1)
@@ -84,11 +79,8 @@ int main(int argc, char *argv[])
 {
     signal(SIGUSR1, getProcess);
     signal(SIGRTMIN,changeAlgorithmFlag);
-    signal(SIGUSR2,terminateProcess);
-    signal(SIGBUS,terminateProcessRR);
-    signal(SIGURG,BlockProcessRR);
-    signal(SIGIO, terminateProcessSRTN);
-    signal(SIGIOT, BlockProcessSRTN);
+    signal(SIGALRM,terminateProcess);
+    signal(SIGUSR2, processMadeOneClk);
 
     initClk();
     createSemaphore();
@@ -114,7 +106,7 @@ int main(int argc, char *argv[])
     case 3:
         // Allocate the queue for algorithm 3
         queue = createQueue();
-        int quantum = atoi(argv[2]);
+        quantum = atoi(argv[2]);
         // Enter an infinite loop to process the queue
         RR(queue,quantum);
         break;

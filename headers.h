@@ -23,6 +23,7 @@ typedef short bool;
 #include "structs.h"
 #include "PQueue.h"
 #include "Queue.h"
+#include "process_generator_tester.h"
 
 
 int messageQueueID;
@@ -80,7 +81,7 @@ void destroyClk(bool terminateAll)
     }
 }
 
-void semaphoreDown(int sem)
+void down(int sem)
 {
     struct sembuf p_op;
 
@@ -90,12 +91,12 @@ void semaphoreDown(int sem)
 
     if (semop(sem, &p_op, 1) == -1)
     {
-        perror("Error in semaphoreDown()");
+        perror("Error in down()");
         exit(-1);
     }
 }
 
-void semaphoreUp(int sem)
+void up(int sem)
 {
     struct sembuf v_op;
 
@@ -105,7 +106,7 @@ void semaphoreUp(int sem)
 
     if (semop(sem, &v_op, 1) == -1)
     {
-        perror("Error in semaphoreUp()");
+        perror("Error in up()");
         exit(-1);
     }
 }
@@ -174,5 +175,8 @@ struct ProcessStruct *create_process(int id, int arrivalTime, int priority, int 
     process->priority = priority;
     process->runningTime = runningTime;
     process->remainingTime = runningTime;
+    process->pid = -1;
+    process->startTime = -1;
+    process->waitingTime = 0;
     return process;
 }
