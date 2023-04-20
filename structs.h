@@ -7,6 +7,7 @@ struct ProcessStruct
     remainingTime;
 };
 
+
 struct msgBuff
 {
     long mtype;

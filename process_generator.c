@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     // 1. Read the input files.
     struct Queue *processQueue = createQueue();
     readFile(processQueue);
-
+    
     // 2. Ask the user for the chosen scheduling algorithm and its parameters, if there are any.
     int algo;
     int quantum = getSchedulingAlgoFromUser(&algo);
@@ -100,6 +100,7 @@ int main(int argc, char *argv[])
     //  6. Send the information to the scheduler at the appropriate time.
     //  7. Clear clock resources
     int clk;
+    int algorithmBlockingFlag=1;
     while (!isEmptyQueue(processQueue))
     {
         struct ProcessStruct *process = dequeue(processQueue);
@@ -112,6 +113,16 @@ int main(int argc, char *argv[])
         fflush(stdout);
         sendProcess(process);
         kill(schedulerPID, SIGUSR1);
+        if(algorithmBlockingFlag&& peekQueue(processQueue)!=NULL&& peekQueue(processQueue)->arrivalTime==clk){
+            algorithmBlockingFlag=0;
+            kill(schedulerPID,SIGRTMIN+1);
+        }
+        else if(!algorithmBlockingFlag&&
+                ((peekQueue(processQueue)!=NULL&& peekQueue(processQueue)->arrivalTime!=clk)||
+                 isEmptyQueue(processQueue))){
+            algorithmBlockingFlag=1;
+            kill(schedulerPID,SIGRTMIN+1);
+        }
         semaphoreDown(processGeneratorAndSchedulerSemID);
     }
     kill(schedulerPID, SIGRTMIN);

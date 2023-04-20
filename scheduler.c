@@ -1,6 +1,7 @@
 #include "headers.h"
 int algorithmFlag = 1;
 int childProcessPID;
+int algorithmBlockingFlag=1;//block algorithm till all processes at a certain instace arrive
 #include "HPF.h"
 #include "RR.h"
 #include "SRTN.h"
@@ -79,6 +80,9 @@ void changeAlgorithmFlag(int sigNum){
     algorithmFlag=0;
     fflush(stdout);
 }
+void changeBlockingFlag(int signum){
+    algorithmBlockingFlag=!algorithmBlockingFlag;
+}
 
 int main(int argc, char *argv[])
 {
@@ -89,6 +93,7 @@ int main(int argc, char *argv[])
     signal(SIGURG,BlockProcessRR);
     signal(SIGIO, terminateProcessSRTN);
     signal(SIGIOT, BlockProcessSRTN);
+    signal(SIGRTMIN+1,changeBlockingFlag);
 
     initClk();
     createSemaphore();

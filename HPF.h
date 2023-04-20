@@ -40,7 +40,7 @@ void HPF(struct PQueue *pqueue)
     while (algorithmFlag||!isEmptyPQ(processQueue) || isRunning) { // while queue isn't empty or runung
         if (isEmptyPQ(processQueue)) // queue is empty doesn't make thing
             continue;
-        if (!isRunning) {          // isn't running and in Pqueue --> run it
+        if (!isRunning && algorithmBlockingFlag) {          // isn't running and in Pqueue --> run it
             readyProcess = peek(processQueue);
             pop(processQueue);
             runningProcess=readyProcess;
