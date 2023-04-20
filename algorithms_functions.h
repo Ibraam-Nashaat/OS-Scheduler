@@ -29,10 +29,10 @@ void runProcess(struct ProcessStruct *currProcess)
     runningProcess=currProcess;
     isRunning = true;
     //runningProcess->lastStartedTime = getClk();
-    if(runningProcess->pid != -1) // if the process started before , send SIGCONT to make it continue its execution
+    if(runningProcess->pid != -1) // if the process started before , send SIGRTMIN+5 to make it continue its execution
     {
         printf("Process with id %d and pid %d continued, clk %d\n", runningProcess->id,runningProcess->pid, getClk());
-        kill(runningProcess->pid,SIGCONT);
+        kill(runningProcess->pid,SIGRTMIN+5);
         previous_id = runningProcess->id;
         return;
     }
@@ -72,7 +72,7 @@ This function blocks the process, put it at the end of the queue and make isRunn
 */
 void blockProcess()
 {
-    kill(runningProcess->pid,SIGSTOP);
+    kill(runningProcess->pid,SIGRTMIN+4);
     if(selectedAlgorithm == 3)
         {            
             enqueue(queue,runningProcess);
@@ -94,18 +94,5 @@ This function decrement the currQuantum and remainingTime of the process and do 
 void processMadeOneClk(int sigNum)
 {
     runningProcess->remainingTime--;
-    if(selectedAlgorithm==3){
-        currQuantum--;
-        if (!currQuantum && runningProcess->remainingTime){ // in case RR
-            if(!isEmptyQueue(queue)) 
-            {
-                blockProcess();
-            }
-            else
-                {
-                    currQuantum=quantum;
-                    kill(runningProcess->pid,SIGCONT);
-                }        
-        } 
-    }
+    
 }
