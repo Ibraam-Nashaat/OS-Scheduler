@@ -1,14 +1,14 @@
 struct ProcessStruct
 {
     int id,
-    arrivalTime,
-    priority,
-    runningTime,
-    remainingTime,
-    startTime,
-    waitingTime,
-    lastStopedTime,
-    pid;
+        arrivalTime,
+        priority,
+        runningTime,
+        remainingTime,
+        startTime,
+        waitingTime,
+        lastStopedTime,
+        pid;
 };
 
 struct msgBuff
@@ -18,23 +18,23 @@ struct msgBuff
 };
 struct PQNode
 {
-    struct ProcessStruct* data; // data of Node
-    struct PQNode * next;  // pointer for next Node
+    struct ProcessStruct *data; // data of Node
+    struct PQNode *next;        // pointer for next Node
     int priority;
 };
-//Queue Struct
+// Queue Struct
 struct PQueue
 {
-    struct PQNode * head ,* tail;
+    struct PQNode *head, *tail;
 };
 
 struct Node
 {
-    struct ProcessStruct*  data; // data of Node
-    struct Node * next;  // pointer for next Node
+    struct ProcessStruct *data; // data of Node
+    struct Node *next;          // pointer for next Node
 };
-//Queue Struct
+// Queue Struct
 struct Queue
 {
-    struct Node * head ,* tail;
+    struct Node *head, *tail;
 };

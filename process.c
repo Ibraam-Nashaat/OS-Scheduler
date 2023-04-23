@@ -5,7 +5,8 @@
 bool interruptionFlag = 0;
 
 // Handler function for interruption signal
-void interruptionHandler(int signum){
+void interruptionHandler(int signum)
+{
     interruptionFlag = 1;
 }
 
@@ -23,29 +24,32 @@ int main(int argc, char *argv[])
     while (remainingTime > 0)
     {
         currentTime = getClk();
-        if(interruptionFlag){
+        if (interruptionFlag)
+        {
             // Reset flag and time if interrupted
             interruptionFlag = 0;
             previousTime = currentTime = getClk();
         }
-        if (currentTime != previousTime )
+        if (currentTime != previousTime)
+        {
+            // Decrease remaining time and current quantum
+            remainingTime--;
+            if (currentQuantum != -1)
+                currentQuantum--;
+            if (currentQuantum == 0)
             {
-                // Decrease remaining time and current quantum
-                remainingTime--;
-                if(currentQuantum != -1) currentQuantum--;
-                if(currentQuantum == 0) {
-                    // Send signal to parent process that quantum expired
-                    kill(getppid(), QUANTUM_FINISHED);
-                    // Stop the process until resumed
-                    kill(getpid(), SIGSTOP);
-                    // Reset current quantum
-                    currentQuantum = quantum;
-                }
-                currentTime = getClk();
+                // Send signal to parent process that quantum expired
+                kill(getppid(), QUANTUM_FINISHED);
+                // Stop the process until resumed
+                kill(getpid(), SIGSTOP);
+                // Reset current quantum
+                currentQuantum = quantum;
             }
+            currentTime = getClk();
+        }
         previousTime = currentTime;
     }
-    
+
     // Send signal to parent process that process finished
     kill(getppid(), PROCESS_FINISHED_SIGNAL);
     destroyClk(false);

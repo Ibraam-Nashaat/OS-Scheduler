@@ -4,7 +4,6 @@
 #include "RR.h"
 #include "SRTN.h"
 
-
 void pushProcessToSRTN(struct ProcessStruct process)
 {
     if (process.id != -1)
@@ -54,12 +53,14 @@ void getProcess(int signum)
         break;
     case 2:
         pushProcessToSRTN(message.process);
-        if(isRunning){
-            int tempRunningRime=runningProcess->remainingTime;
-            runningProcess->remainingTime=runningProcess->remainingTime-(getClk()-runningProcess->lastStopedTime);
-            if(message.process.runningTime < runningProcess->remainingTime)
-                 blockProcess();
-            else runningProcess->remainingTime=tempRunningRime;
+        if (isRunning)
+        {
+            int tempRunningRime = runningProcess->remainingTime;
+            runningProcess->remainingTime = runningProcess->remainingTime - (getClk() - runningProcess->lastStopedTime);
+            if (message.process.runningTime < runningProcess->remainingTime)
+                blockProcess();
+            else
+                runningProcess->remainingTime = tempRunningRime;
         }
         break;
     case 3:
@@ -77,54 +78,58 @@ void getProcess(int signum)
         algorithmFlag = 0;
     }
 }
-void changeAlgorithmFlag(int sigNum){
-    algorithmFlag=0;
+void changeAlgorithmFlag(int sigNum)
+{
+    algorithmFlag = 0;
 }
-void changeBlockingFlag(int signum){
-    algorithmBlockingFlag=!algorithmBlockingFlag;
+void changeBlockingFlag(int signum)
+{
+    algorithmBlockingFlag = !algorithmBlockingFlag;
 }
 
-int main(int argc, char *argv[]) {
-  // Register the signal handlers
-  signal(GET_PROCESS, getProcess);
-  signal(CHANGE_ALGORITHM, changeAlgorithmFlag);
-  signal(PROCESS_FINISHED_SIGNAL, terminateProcess);
-  signal(QUANTUM_FINISHED, quantumFinished);
-  signal(CHANGE_BLOCKING, changeBlockingFlag);
+int main(int argc, char *argv[])
+{
+    // Register the signal handlers
+    signal(GET_PROCESS, getProcess);
+    signal(CHANGE_ALGORITHM, changeAlgorithmFlag);
+    signal(PROCESS_FINISHED_SIGNAL, terminateProcess);
+    signal(QUANTUM_FINISHED, quantumFinished);
+    signal(CHANGE_BLOCKING, changeBlockingFlag);
 
-  // Initialize the clock
-  initClk();
+    // Initialize the clock
+    initClk();
 
-  // Create the semaphore and the message queue
-  createSemaphore();
-  createMessageQueue();
+    // Create the semaphore and the message queue
+    createSemaphore();
+    createMessageQueue();
 
-  // Get the selected algorithm from the command line argument
-  selectedAlgorithm = atoi(argv[1]);
-  printf("Selected Algorithm: %d\n", selectedAlgorithm);
-  fflush(stdout);
+    // Get the selected algorithm from the command line argument
+    selectedAlgorithm = atoi(argv[1]);
+    printf("Selected Algorithm: %d\n", selectedAlgorithm);
+    fflush(stdout);
 
-  // Switch on the selected algorithm and allocate the appropriate data structure
-  switch (selectedAlgorithm) {
+    // Switch on the selected algorithm and allocate the appropriate data structure
+    switch (selectedAlgorithm)
+    {
     case HPF_ALGORITHM:
-      priorityQueue = createPriorityQueue();
-      HPF(priorityQueue);
-      break;
+        priorityQueue = createPriorityQueue();
+        HPF(priorityQueue);
+        break;
     case SRTN_ALGORITHM:
-      priorityQueue = createPriorityQueue();
-      SRTN(priorityQueue);
-      break;
+        priorityQueue = createPriorityQueue();
+        SRTN(priorityQueue);
+        break;
     case RR_ALGORITHM:
-      queue = createQueue();
-      quantum = atoi(argv[2]);
-      RR(queue, quantum);
-      break;
+        queue = createQueue();
+        quantum = atoi(argv[2]);
+        RR(queue, quantum);
+        break;
     default:
-      printf("Invalid algorithm selected.\n");
-      break;
-  }
+        printf("Invalid algorithm selected.\n");
+        break;
+    }
 
-  // Destroy the clock and exit
-  destroyClk(false);
-  return 0;
+    // Destroy the clock and exit
+    destroyClk(false);
+    return 0;
 }

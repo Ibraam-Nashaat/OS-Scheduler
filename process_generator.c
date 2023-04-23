@@ -63,7 +63,7 @@ void sendProcess(struct ProcessStruct *process)
 
 int main(int argc, char *argv[])
 {
-    
+
     signal(SIGINT, clearResources);
     // TODO Initialization
     // 1. Read the input files.
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
     //  6. Send the information to the scheduler at the appropriate time.
     //  7. Clear clock resources
     int clk;
-    int algorithmBlockingFlag=1;
+    int algorithmBlockingFlag = 1;
     while (!isEmptyQueue(processQueue))
     {
         struct ProcessStruct *process = dequeue(processQueue);
@@ -114,20 +114,22 @@ int main(int argc, char *argv[])
         fflush(stdout);
         sendProcess(process);
         kill(schedulerPID, SIGUSR1);
-        if(algorithmBlockingFlag&& peekQueue(processQueue)!=NULL&& peekQueue(processQueue)->arrivalTime==clk){
-            algorithmBlockingFlag=0;
-            kill(schedulerPID,SIGRTMIN+2);
+        if (algorithmBlockingFlag && peekQueue(processQueue) != NULL && peekQueue(processQueue)->arrivalTime == clk)
+        {
+            algorithmBlockingFlag = 0;
+            kill(schedulerPID, SIGRTMIN + 2);
         }
-        else if(!algorithmBlockingFlag&&
-                ((peekQueue(processQueue)!=NULL&& peekQueue(processQueue)->arrivalTime!=clk)||
-                 isEmptyQueue(processQueue))){
-            algorithmBlockingFlag=1;
-            kill(schedulerPID,SIGRTMIN+2);
+        else if (!algorithmBlockingFlag &&
+                 ((peekQueue(processQueue) != NULL && peekQueue(processQueue)->arrivalTime != clk) ||
+                  isEmptyQueue(processQueue)))
+        {
+            algorithmBlockingFlag = 1;
+            kill(schedulerPID, SIGRTMIN + 2);
         }
         down(processGeneratorAndSchedulerSemID);
     }
     kill(schedulerPID, SIGRTMIN);
-    
+
     waitpid(schedulerPID, NULL, 0);
 
     destroyClk(true);

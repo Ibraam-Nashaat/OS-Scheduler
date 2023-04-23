@@ -20,7 +20,6 @@ typedef short bool;
 #include "Queue.h"
 #include "process_generator_tester.h"
 
-
 int messageQueueID;
 int processGeneratorAndSchedulerSemID; // The ID of the semaphore between process generator and scheduler
 ///==============================
@@ -173,6 +172,6 @@ struct ProcessStruct *create_process(int id, int arrivalTime, int priority, int 
     process->pid = -1;
     process->startTime = -1;
     process->waitingTime = 0;
-    process->lastStopedTime=-1;
+    process->lastStopedTime = -1;
     return process;
 }

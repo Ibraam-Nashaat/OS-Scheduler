@@ -1,14 +1,13 @@
 #include "defines.h"
 
 int algorithmFlag = 1;
-int algorithmBlockingFlag=1; //for handling processes that arrive at the same time
-int selectedAlgorithm,quantum;
+int algorithmBlockingFlag = 1; // for handling processes that arrive at the same time
+int selectedAlgorithm, quantum;
 bool isRunning;
 struct msgBuff message;
 struct PQueue *priorityQueue;
 struct Queue *queue;
-struct ProcessStruct * runningProcess = NULL;
-
+struct ProcessStruct *runningProcess = NULL;
 
 // Run a process with a given quantum time
 // currProcess: a pointer to the process structure
@@ -17,7 +16,7 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
 {
     runningProcess = currProcess;
     isRunning = true;
-    //runningProcess->lastStartedTime = getClk();
+    // runningProcess->lastStartedTime = getClk();
     if (runningProcess->pid != -1) // if the process started before, send CONTINUE_PROCESS signal to make it continue its execution
     {
         printf("Process with id %d and pid %d continued, clk %d\n", runningProcess->id, runningProcess->pid, getClk());
@@ -25,7 +24,8 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
         return;
     }
     int pid = fork();
-    if (pid == -1) {
+    if (pid == -1)
+    {
         perror("Error in fork");
         exit(-1);
     }
@@ -36,14 +36,15 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
         char remainigTimeChar[13];
         sprintf(remainigTimeChar, "%d", currProcess->remainingTime);
         char quantumChar[13];
-        sprintf(quantumChar,"%d",quantum);
-        char* argv []={"./process.out",remainigTimeChar,quantumChar,NULL}; // send remaining time and quantum as arguments
+        sprintf(quantumChar, "%d", quantum);
+        char *argv[] = {"./process.out", remainigTimeChar, quantumChar, NULL}; // send remaining time and quantum as arguments
         int execlResult = execvp(argv[0], argv);
-        if (execlResult == -1) {
+        if (execlResult == -1)
+        {
             perror("Error in execvp");
             exit(-1);
         }
-    }    
+    }
     runningProcess->pid = pid;
     runningProcess->startTime = getClk();
     runningProcess->lastStopedTime = getClk();
@@ -51,31 +52,36 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
 
 // This function terminates the process and frees the memory
 // sigNum: the signal number for termination
-void terminateProcess(int sigNum) {
-  printf("process %d finished At=%d\n", runningProcess->id, getClk());
-  free(runningProcess);
-  runningProcess = NULL;
-  isRunning=false;
-  fflush(stdout);
+void terminateProcess(int sigNum)
+{
+    printf("process %d finished At=%d\n", runningProcess->id, getClk());
+    free(runningProcess);
+    runningProcess = NULL;
+    isRunning = false;
+    fflush(stdout);
 }
 
 // This function blocks the process, puts it at the end of the queue or the priority queue depending on the algorithm, and makes isRunning=false to begin another process.
-void blockProcess() {
-  if(selectedAlgorithm == 3) {
-    // For round robin algorithm, enqueue the process at the end of the queue
-    // queue: a pointer to the queue structure
-    // runningProcess: a pointer to the process structure
-    enqueue(queue,runningProcess);
-  } else {
-    // For shortest remaining time next algorithm, update the last stopped time and the remaining time of the process, and push it to the priority queue
-    // priorityQueue: a pointer to the priority queue structure
-    // runningProcess: a pointer to the process structure
-    runningProcess->lastStopedTime=getClk();
-    kill(runningProcess->pid,INTERRUPT_SIGNAL);
-    kill(runningProcess->pid,SIGSTOP);
-    push(priorityQueue,runningProcess,runningProcess->remainingTime);
-  }
-  printf("id = %d Blocked pid = %d remainingtime = %d current time = %d \n", runningProcess->id, runningProcess->pid, runningProcess->remainingTime, getClk());
-  isRunning=false;
-  fflush(stdout);
+void blockProcess()
+{
+    if (selectedAlgorithm == 3)
+    {
+        // For round robin algorithm, enqueue the process at the end of the queue
+        // queue: a pointer to the queue structure
+        // runningProcess: a pointer to the process structure
+        enqueue(queue, runningProcess);
+    }
+    else
+    {
+        // For shortest remaining time next algorithm, update the last stopped time and the remaining time of the process, and push it to the priority queue
+        // priorityQueue: a pointer to the priority queue structure
+        // runningProcess: a pointer to the process structure
+        runningProcess->lastStopedTime = getClk();
+        kill(runningProcess->pid, INTERRUPT_SIGNAL);
+        kill(runningProcess->pid, SIGSTOP);
+        push(priorityQueue, runningProcess, runningProcess->remainingTime);
+    }
+    printf("id = %d Blocked pid = %d remainingtime = %d current time = %d \n", runningProcess->id, runningProcess->pid, runningProcess->remainingTime, getClk());
+    isRunning = false;
+    fflush(stdout);
 }
