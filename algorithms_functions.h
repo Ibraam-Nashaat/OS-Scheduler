@@ -24,7 +24,7 @@ At time 10 process 1 finished arr 1 total 6 remain 0 wait 3 TA 10 WTA 1.67
 
 */
 
-void runProcess(struct ProcessStruct *currProcess)
+void runProcess(struct ProcessStruct *currProcess,int quantum)
 {
     runningProcess=currProcess;
     isRunning = true;
@@ -32,11 +32,10 @@ void runProcess(struct ProcessStruct *currProcess)
     if(runningProcess->pid != -1) // if the process started before , send SIGRTMIN+5 to make it continue its execution
     {
         printf("Process with id %d and pid %d continued, clk %d\n", runningProcess->id,runningProcess->pid, getClk());
-        kill(runningProcess->pid,SIGRTMIN+5);
+        kill(runningProcess->pid,SIGCONT);
         previous_id = runningProcess->id;
         return;
     }
-
     int pid = fork();
     if (pid == -1) {
         perror("Error in execl");
@@ -49,7 +48,9 @@ void runProcess(struct ProcessStruct *currProcess)
         fflush(stdout);
         char remainigTimeChar[13];
         sprintf(remainigTimeChar, "%d", currProcess->remainingTime);
-        char* argv []={"./process.out",remainigTimeChar,NULL}; // send remaining time as an argument
+        char quantumChar[13];
+        sprintf(quantumChar,"%d",quantum);
+        char* argv []={"./process.out",remainigTimeChar,quantumChar,NULL}; // send remaining time as an argument
         int execlResult = execvp(argv[0], argv);
     }    
     runningProcess->pid = pid;
@@ -72,7 +73,6 @@ This function blocks the process, put it at the end of the queue and make isRunn
 */
 void blockProcess()
 {
-    kill(runningProcess->pid,SIGRTMIN+4);
     if(selectedAlgorithm == 3)
         {            
             enqueue(queue,runningProcess);
@@ -91,8 +91,4 @@ void blockProcess()
 /*
 This function decrement the currQuantum and remainingTime of the process and do the required checks to either block the process or make it continue.
 */
-void processMadeOneClk(int sigNum)
-{
-    runningProcess->remainingTime--;
-    
-}
+

@@ -11,7 +11,7 @@ void SRTN(struct PQueue *pQueue)
             readyProcess = peek(priorityQueue);
             pop(priorityQueue);            
             runningProcess = readyProcess;
-            runProcess(readyProcess);
+            runProcess(readyProcess,-1);
         }
         //printf("hello %d\n",isEmptyPQ(priorityQueue));
     }

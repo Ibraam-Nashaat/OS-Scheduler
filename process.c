@@ -1,19 +1,11 @@
 #include "headers.h"
-int remainingTime, previousTime, currentTime, quantum;
-void resumeProcessHandler(int signum){
-    previousTime=currentTime=getClk();
-    kill(getpid(),SIGCONT);
-}
-void sleepProcess(int signum){
-    pause();
-}
 int main(int argc, char *argv[])
 {
+    int remainingTime, previousTime, currentTime, quantum,currQuantum;
     initClk();
     remainingTime = atoi(argv[1]);
+    quantum=currQuantum=atoi(argv[2]);
     previousTime=getClk();
-    signal(SIGRTMIN+5,resumeProcessHandler);
-    signal(SIGRTMIN+4,sleepProcess);
 
     while (remainingTime > 0)
     {
@@ -21,7 +13,12 @@ int main(int argc, char *argv[])
         if (currentTime != previousTime )
             {
                 remainingTime--;
-                kill(getppid(), SIGRTMIN+1);
+                if(currQuantum!=-1)currQuantum--;
+                if(currQuantum==0) {
+                    kill(getppid(),SIGRTMIN+1);
+                    kill(getpid(),SIGSTOP);
+                    currQuantum=quantum;
+                }
                 currentTime = getClk();
             }
         previousTime = currentTime;

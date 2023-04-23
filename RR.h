@@ -1,3 +1,7 @@
+void quantumFinished(int signum){
+ if(isEmptyQueue(queue)) kill(runningProcess->pid,SIGCONT);
+ else blockProcess();
+}
 void RR(struct Queue *q, int quant)
 {
     struct ProcessStruct *readyProcess;  //pointer for processes in Pqueue 
@@ -13,7 +17,7 @@ void RR(struct Queue *q, int quant)
             readyProcess = dequeue(queue);
             currQuantum = quantum;
             runningProcess=readyProcess;
-            runProcess(readyProcess);
+            runProcess(readyProcess,quantum);
         }
     }
 };

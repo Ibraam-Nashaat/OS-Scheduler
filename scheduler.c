@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
     signal(SIGUSR1, getProcess);
     signal(SIGRTMIN,changeAlgorithmFlag);
     signal(SIGUSR2,terminateProcess);
-    signal(SIGRTMIN+1, processMadeOneClk);
+    signal(SIGRTMIN+1, quantumFinished);
 
     initClk();
     createSemaphore();
