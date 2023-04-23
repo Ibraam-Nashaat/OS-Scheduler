@@ -1,8 +1,5 @@
 #include "headers.h"
-#include "algorithms_functions.h"
-#include "HPF.h"
-#include "RR.h"
-#include "SRTN.h"
+#include "scheduling_algorithms.h"
 
 void pushProcessToSRTN(struct ProcessStruct process)
 {
