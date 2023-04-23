@@ -13,13 +13,8 @@
 #include <string.h>
 
 typedef short bool;
-#define true 1
-#define false 0
 
-#define SHMKEY 300
-#define MSQKEY 65
-#define SEMKEY 70
-
+#include "defines.h"
 #include "structs.h"
 #include "PQueue.h"
 #include "Queue.h"

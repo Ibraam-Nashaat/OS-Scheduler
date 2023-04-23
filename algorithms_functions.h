@@ -1,3 +1,5 @@
+#include "defines.h"
+
 int algorithmFlag = 1;
 int algorithmBlockingFlag=1; //for handling processes that arrive at the same time
 int selectedAlgorithm,quantum;
@@ -63,7 +65,7 @@ void blockProcess()
         else
         {
             runningProcess->lastStopedTime=getClk();
-            kill(runningProcess->pid,SIGRTMIN+4);
+            kill(runningProcess->pid,INTERRUPT_SIGNAL);
             kill(runningProcess->pid,SIGSTOP);
             push(priorityQueue,runningProcess,runningProcess->remainingTime);
         }

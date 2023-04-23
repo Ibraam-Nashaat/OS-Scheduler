@@ -1,7 +1,5 @@
 #define NULL ((void *)0)
 
-
-
 struct PQNode* newPQNode(struct ProcessStruct* process ,int priority)
 {
     struct PQNode * temp=(struct PQNode*)malloc(sizeof(struct PQNode));

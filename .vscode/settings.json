@@ -1,5 +1,8 @@
 {
-    "files.associations": {
-        "msg.h": "c"
-    }
+  "files.associations": {
+    "msg.h": "c",
+    "srtn.h": "c",
+    "process_generator_tester.h": "c",
+    "sem.h": "c"
+  }
 }
