@@ -1,15 +1,10 @@
 int algorithmFlag = 1;
-int childProcessPID;
-int selectedAlgorithm;
-int quantum;
-int currQuantum;
-int previous_id;
+int selectedAlgorithm,quantum;
 bool isRunning;
 struct msgBuff message;
 struct PQueue *priorityQueue;
 struct Queue *queue;
 struct ProcessStruct * runningProcess = NULL;
-struct ProcessStruct * previousProcess = NULL;
 
 
 void runProcess(struct ProcessStruct *currProcess,int quantum)
@@ -21,7 +16,6 @@ void runProcess(struct ProcessStruct *currProcess,int quantum)
     {
         printf("Process with id %d and pid %d continued, clk %d\n", runningProcess->id,runningProcess->pid, getClk());
         kill(runningProcess->pid,SIGCONT);
-        previous_id = runningProcess->id;
         return;
     }
     int pid = fork();
@@ -31,8 +25,7 @@ void runProcess(struct ProcessStruct *currProcess,int quantum)
     }
     if(pid==0) // make new process
     {
-        childProcessPID=getpid();
-        printf("process %d at time %d \n", runningProcess->id, getClk());
+        printf("process %d started at time %d \n", runningProcess->id, getClk());
         fflush(stdout);
         char remainigTimeChar[13];
         sprintf(remainigTimeChar, "%d", currProcess->remainingTime);
@@ -42,7 +35,6 @@ void runProcess(struct ProcessStruct *currProcess,int quantum)
         int execlResult = execvp(argv[0], argv);
     }    
     runningProcess->pid = pid;
-    previous_id = runningProcess->id;
     runningProcess->startTime=getClk();
     runningProcess->lastStopedTime=getClk();
 }

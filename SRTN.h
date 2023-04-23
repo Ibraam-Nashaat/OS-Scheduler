@@ -1,6 +1,4 @@
-void calculateSRTNProcessRemainingTime(){
- 
-}
+
 void SRTN(struct PQueue *pQueue)
 {
     
@@ -15,6 +13,5 @@ void SRTN(struct PQueue *pQueue)
             runningProcess = readyProcess;
             runProcess(readyProcess,-1);
         }
-        //printf("hello %d\n",isEmptyPQ(priorityQueue));
     }
 };

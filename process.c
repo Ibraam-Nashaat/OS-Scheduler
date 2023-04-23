@@ -1,11 +1,11 @@
 #include "headers.h"
-int remainingTime, previousTime, currentTime, quantum,currQuantum;
 bool SRTNInteruptionFlag=0;
 void SRTNInteruptionHandler(int signum){
     SRTNInteruptionFlag=1;
 }
 int main(int argc, char *argv[])
 {
+    int remainingTime, previousTime, currentTime, quantum,currQuantum;
     initClk();
     remainingTime = atoi(argv[1]);
     quantum=currQuantum=atoi(argv[2]);
@@ -22,7 +22,6 @@ int main(int argc, char *argv[])
         if (currentTime != previousTime )
             {
                 remainingTime--;
-                //printf("remaining time %d at clk %d\n",remainingTime,getClk());
                 if(currQuantum!=-1)currQuantum--;
                 if(currQuantum==0) {
                     kill(getppid(),SIGRTMIN+1);

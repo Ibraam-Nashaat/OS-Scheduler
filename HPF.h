@@ -10,7 +10,6 @@ void HPF(struct PQueue *pqueue)
             readyProcess = peek(processQueue);
             pop(processQueue);
             runningProcess=readyProcess;
-            quantum = currQuantum = readyProcess->runningTime;
             runProcess(readyProcess,-1);
         }
     }
