@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
         if (currentTime != previousTime )
             {
                 remainingTime--;
-                printf("remaining time %d at clk %d\n",remainingTime,getClk());
+                //printf("remaining time %d at clk %d\n",remainingTime,getClk());
                 if(currQuantum!=-1)currQuantum--;
                 if(currQuantum==0) {
                     kill(getppid(),SIGRTMIN+1);

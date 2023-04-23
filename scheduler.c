@@ -54,8 +54,11 @@ void getProcess(int signum)
         break;
     case 2:
         pushProcessToSRTN(message.process);
-        if(isRunning && peek(priorityQueue)->runningTime < runningProcess->remainingTime)
-            blockProcess();
+        if(isRunning){
+            runningProcess->remainingTime=runningProcess->remainingTime-(getClk()-runningProcess->lastStopedTime);
+            if(message.process.runningTime < runningProcess->remainingTime)
+                 blockProcess();
+        }
         break;
     case 3:
         pushProcessToRR(message.process);

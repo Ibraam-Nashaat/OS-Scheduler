@@ -11,18 +11,6 @@ struct Queue *queue;
 struct ProcessStruct * runningProcess = NULL;
 struct ProcessStruct * previousProcess = NULL;
 
-#define QUANTUM_ONE 1;
-
-/*
-
-At time 1 process 1 started arr 1 total 6 remain 6 wait 0
-At time 3 process 1 stopped arr 1 total 6 remain 4 wait 0
-At time 3 process 2 started arr 3 total 3 remain 3 wait 0
-At time 6 process 2 finished arr 3 total 3 remain 0 wait 0 TA 3 WTA 1
-At time 6 process 1 resumed arr 1 total 6 remain 4 wai t 3
-At time 10 process 1 finished arr 1 total 6 remain 0 wait 3 TA 10 WTA 1.67
-
-*/
 
 void runProcess(struct ProcessStruct *currProcess,int quantum)
 {
@@ -44,7 +32,7 @@ void runProcess(struct ProcessStruct *currProcess,int quantum)
     if(pid==0) // make new process
     {
         childProcessPID=getpid();
-        printf("process %d at time %d and stopping time %d\n", runningProcess->id, getClk(),runningProcess->lastStopedTime);
+        printf("process %d at time %d \n", runningProcess->id, getClk());
         fflush(stdout);
         char remainigTimeChar[13];
         sprintf(remainigTimeChar, "%d", currProcess->remainingTime);
@@ -81,8 +69,6 @@ void blockProcess()
         }
         else
         {
-            printf("stopping time %d\n",runningProcess->lastStopedTime);
-            runningProcess->remainingTime=runningProcess->remainingTime-(getClk()-runningProcess->lastStopedTime);
             runningProcess->lastStopedTime=getClk();
             kill(runningProcess->pid,SIGRTMIN+4);
             kill(runningProcess->pid,SIGSTOP);

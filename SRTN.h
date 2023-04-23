@@ -1,3 +1,6 @@
+void calculateSRTNProcessRemainingTime(){
+ 
+}
 void SRTN(struct PQueue *pQueue)
 {
     
