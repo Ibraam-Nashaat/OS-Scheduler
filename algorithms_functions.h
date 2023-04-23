@@ -10,23 +10,26 @@ struct Queue *queue;
 struct ProcessStruct * runningProcess = NULL;
 
 
-void runProcess(struct ProcessStruct *currProcess,int quantum)
+// Run a process with a given quantum time
+// currProcess: a pointer to the process structure
+// quantum: the quantum time for RR algorithm
+void runProcess(struct ProcessStruct *currProcess, int quantum)
 {
-    runningProcess=currProcess;
+    runningProcess = currProcess;
     isRunning = true;
     //runningProcess->lastStartedTime = getClk();
-    if(runningProcess->pid != -1) // if the process started before , send SIGRTMIN+5 to make it continue its execution
+    if (runningProcess->pid != -1) // if the process started before, send CONTINUE_PROCESS signal to make it continue its execution
     {
-        printf("Process with id %d and pid %d continued, clk %d\n", runningProcess->id,runningProcess->pid, getClk());
-        kill(runningProcess->pid,SIGCONT);
+        printf("Process with id %d and pid %d continued, clk %d\n", runningProcess->id, runningProcess->pid, getClk());
+        kill(runningProcess->pid, CONTINUE_PROCESS);
         return;
     }
     int pid = fork();
     if (pid == -1) {
-        perror("Error in execl");
+        perror("Error in fork");
         exit(-1);
     }
-    if(pid==0) // make new process
+    if (pid == 0) // make new process
     {
         printf("process %d started at time %d \n", runningProcess->id, getClk());
         fflush(stdout);
@@ -34,12 +37,16 @@ void runProcess(struct ProcessStruct *currProcess,int quantum)
         sprintf(remainigTimeChar, "%d", currProcess->remainingTime);
         char quantumChar[13];
         sprintf(quantumChar,"%d",quantum);
-        char* argv []={"./process.out",remainigTimeChar,quantumChar,NULL}; // send remaining time as an argument
+        char* argv []={"./process.out",remainigTimeChar,quantumChar,NULL}; // send remaining time and quantum as arguments
         int execlResult = execvp(argv[0], argv);
+        if (execlResult == -1) {
+            perror("Error in execvp");
+            exit(-1);
+        }
     }    
     runningProcess->pid = pid;
-    runningProcess->startTime=getClk();
-    runningProcess->lastStopedTime=getClk();
+    runningProcess->startTime = getClk();
+    runningProcess->lastStopedTime = getClk();
 }
 
 /*
