@@ -7,7 +7,7 @@ struct ProcessStruct
     remainingTime,
     startTime,
     waitingTime,
-    lastStartedTime,
+    lastStopedTime,
     pid;
 };
 

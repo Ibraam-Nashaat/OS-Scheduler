@@ -178,5 +178,6 @@ struct ProcessStruct *create_process(int id, int arrivalTime, int priority, int 
     process->pid = -1;
     process->startTime = -1;
     process->waitingTime = 0;
+    process->lastStopedTime=-1;
     return process;
 }

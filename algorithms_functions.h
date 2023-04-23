@@ -44,7 +44,7 @@ void runProcess(struct ProcessStruct *currProcess,int quantum)
     if(pid==0) // make new process
     {
         childProcessPID=getpid();
-        printf("process %d at time %d\n", runningProcess->id, getClk());
+        printf("process %d at time %d and stopping time %d\n", runningProcess->id, getClk(),runningProcess->lastStopedTime);
         fflush(stdout);
         char remainigTimeChar[13];
         sprintf(remainigTimeChar, "%d", currProcess->remainingTime);
@@ -55,6 +55,8 @@ void runProcess(struct ProcessStruct *currProcess,int quantum)
     }    
     runningProcess->pid = pid;
     previous_id = runningProcess->id;
+    runningProcess->startTime=getClk();
+    runningProcess->lastStopedTime=getClk();
 }
 
 /*
@@ -79,6 +81,11 @@ void blockProcess()
         }
         else
         {
+            printf("stopping time %d\n",runningProcess->lastStopedTime);
+            runningProcess->remainingTime=runningProcess->remainingTime-(getClk()-runningProcess->lastStopedTime);
+            runningProcess->lastStopedTime=getClk();
+            kill(runningProcess->pid,SIGRTMIN+4);
+            kill(runningProcess->pid,SIGSTOP);
             push(priorityQueue,runningProcess,runningProcess->remainingTime);
         }
     
@@ -88,7 +95,4 @@ void blockProcess()
     fflush(stdout);
 }
 
-/*
-This function decrement the currQuantum and remainingTime of the process and do the required checks to either block the process or make it continue.
-*/
 
