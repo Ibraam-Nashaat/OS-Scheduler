@@ -7,7 +7,7 @@ void SRTN(struct PQueue *pQueue)
     while (algorithmFlag||!isEmptyPQ(priorityQueue) || isRunning) { // while queue isn't empty or runung
         if (isEmptyPQ(priorityQueue)) // queue is empty doesn't do anything
             continue;
-        if (!isRunning) {          // isn't running and in Pqueue --> run it  
+        if (!isRunning && algorithmBlockingFlag) {          // isn't running and in Pqueue --> run it  
             readyProcess = peek(priorityQueue);
             pop(priorityQueue);            
             runningProcess = readyProcess;

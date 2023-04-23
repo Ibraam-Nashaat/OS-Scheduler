@@ -60,4 +60,9 @@ process =temp->data;
 free(temp);
 return process;
 }
+struct ProcessStruct* peekQueue(struct Queue* q) {
+    if (isEmptyQueue(q))
+        return NULL;
+    return q->head->data;
+}
 

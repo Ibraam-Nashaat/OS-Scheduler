@@ -80,6 +80,9 @@ void getProcess(int signum)
 void changeAlgorithmFlag(int sigNum){
     algorithmFlag=0;
 }
+void changeBlockingFlag(int signum){
+    algorithmBlockingFlag=!algorithmBlockingFlag;
+}
 
 int main(int argc, char *argv[])
 {
@@ -87,6 +90,7 @@ int main(int argc, char *argv[])
     signal(SIGRTMIN,changeAlgorithmFlag);
     signal(SIGUSR2,terminateProcess);
     signal(SIGRTMIN+1, quantumFinished);
+    signal(SIGRTMIN+2,changeBlockingFlag);
 
     initClk();
     createSemaphore();
@@ -123,4 +127,5 @@ int main(int argc, char *argv[])
     }
 
     destroyClk(false);
+    return 0;
 }

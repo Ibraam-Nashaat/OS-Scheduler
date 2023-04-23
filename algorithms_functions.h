@@ -1,4 +1,5 @@
 int algorithmFlag = 1;
+int algorithmBlockingFlag=1; //for handling processes that arrive at the same time
 int selectedAlgorithm,quantum;
 bool isRunning;
 struct msgBuff message;
