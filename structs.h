@@ -11,6 +11,7 @@ struct ProcessStruct
         pid;
 };
 
+
 struct msgBuff
 {
     long mtype;

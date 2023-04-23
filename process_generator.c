@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
     // 1. Read the input files.
     struct Queue *processQueue = createQueue();
     readFile(processQueue);
-
+    
     // 2. Ask the user for the chosen scheduling algorithm and its parameters, if there are any.
     int algo;
     int quantum = getSchedulingAlgoFromUser(&algo);
