@@ -8,6 +8,14 @@ struct ProcessStruct
         startTime,
         waitingTime,
         lastStopedTime,
+        pid,
+        memSize;
+};
+
+struct memoryNode{
+    int startLocation,
+        endLocation,
+        size,
         pid;
 };
 

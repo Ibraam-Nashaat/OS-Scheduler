@@ -161,7 +161,7 @@ void createSemaphore()
     }
 }
 
-struct ProcessStruct *create_process(int id, int arrivalTime, int priority, int runningTime)
+struct ProcessStruct *create_process(int id, int arrivalTime, int priority, int runningTime,int memSize)
 {
     struct ProcessStruct *process = (struct ProcessStruct *)malloc(sizeof(struct ProcessStruct));
     process->id = id;
@@ -173,5 +173,6 @@ struct ProcessStruct *create_process(int id, int arrivalTime, int priority, int 
     process->startTime = -1;
     process->waitingTime = 0;
     process->lastStopedTime = -1;
+    process->memSize=memSize;
     return process;
 }

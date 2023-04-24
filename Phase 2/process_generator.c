@@ -12,16 +12,16 @@ void readFile(struct Queue *processQueue)
     FILE *file;
     file = fopen("processes.txt", "r");
     char firstLine[40];
-    int id, arrivalTime, priority, runningTime;
+    int id, arrivalTime, priority, runningTime,memSize;
 
     if (fgets(firstLine, 40, file) == NULL)
     {
         perror("Unable to read the first line from file");
     }
 
-    while (fscanf(file, "%d\t%d\t%d\t%d", &id, &arrivalTime, &runningTime, &priority) != EOF)
+    while (fscanf(file, "%d\t%d\t%d\t%d\t%d", &id, &arrivalTime, &runningTime, &priority,&memSize) != EOF)
     {
-        struct ProcessStruct *readProcess = create_process(id, arrivalTime, priority, runningTime);
+        struct ProcessStruct *readProcess = create_process(id, arrivalTime, priority, runningTime,memSize);
         enqueue(processQueue, readProcess);
     }
 

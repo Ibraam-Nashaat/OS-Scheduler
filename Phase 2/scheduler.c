@@ -6,7 +6,7 @@ void pushProcessToSRTN(struct ProcessStruct process)
     if (process.id != -1)
     {
         struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
-                                                          process.runningTime);
+                                                          process.runningTime,process.memSize);
         push(priorityQueue, newProcess, newProcess->remainingTime);
     }
 }
@@ -16,7 +16,7 @@ void pushProcessToHPF(struct ProcessStruct process)
     if (process.id != -1)
     {
         struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
-                                                          process.runningTime);
+                                                          process.runningTime,process.memSize);
         push(priorityQueue, newProcess, newProcess->priority);
     }
 }
@@ -26,7 +26,7 @@ void pushProcessToRR(struct ProcessStruct process)
     if (process.id != -1)
     {
         struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
-                                                          process.runningTime);
+                                                          process.runningTime,process.memSize);
         enqueue(queue, newProcess);
     }
 }
