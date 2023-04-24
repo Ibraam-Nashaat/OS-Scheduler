@@ -27,7 +27,7 @@ void readFile(struct Queue *processQueue)
     }
 
     // processQueue=testReadFile(processQueue);
-    testLinkedList(processQueue);
+   // testLinkedList(processQueue);
 
     fclose(file);
 }
