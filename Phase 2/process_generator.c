@@ -1,4 +1,5 @@
 #include "headers.h"
+#include "process_generator_tester.h"
 int schedulerPID;
 
 void clearResources(int signum)
@@ -26,6 +27,7 @@ void readFile(struct Queue *processQueue)
     }
 
     // processQueue=testReadFile(processQueue);
+    testLinkedList(processQueue);
 
     fclose(file);
 }

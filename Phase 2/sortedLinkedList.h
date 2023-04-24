@@ -54,6 +54,12 @@ bool removeLinkedListNode(struct sortedLinkedListNode* node,struct sortedLinkedL
 {
     struct sortedLinkedListNode* current=LL->head;
     struct sortedLinkedListNode* previous=NULL;
+    if(current!=NULL && current->next==NULL){
+        free(current);
+        LL->head=NULL;
+        LL->tail==NULL;
+        return true;
+    }
     if(current!=NULL && current==node){
         LL->head=current->next;
         free(current);

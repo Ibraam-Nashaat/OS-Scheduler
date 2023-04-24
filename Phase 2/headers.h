@@ -19,7 +19,6 @@ typedef short bool;
 #include "PQueue.h"
 #include "Queue.h"
 #include "sortedLinkedList.h"
-#include "process_generator_tester.h"
 
 int messageQueueID;
 int processGeneratorAndSchedulerSemID; // The ID of the semaphore between process generator and scheduler
