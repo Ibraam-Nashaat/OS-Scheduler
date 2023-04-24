@@ -6,7 +6,7 @@ int selectedAlgorithm, quantum,memoryPolicy;
 bool isRunning;
 struct msgBuff message;
 struct PQueue *priorityQueue;
-struct Queue *queue;
+struct Queue *queue,*processWaitingQueue;
 struct PQueue *memoryHolesPriorityQueue;
 struct Queue *memoryUsedQueue;
 struct ProcessStruct *runningProcess = NULL;
@@ -51,7 +51,12 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
     runningProcess->startTime = getClk();
     runningProcess->lastStopedTime = getClk();
 }
+void deAllocateProcessMemory(){
 
+}
+void reAllocateProcessMemory(){
+    
+}
 // This function terminates the process and frees the memory
 // sigNum: the signal number for termination
 void terminateProcess(int sigNum)
@@ -61,6 +66,8 @@ void terminateProcess(int sigNum)
     runningProcess = NULL;
     isRunning = false;
     fflush(stdout);
+    deAllocateProcessMemory();
+    reAllocateProcessMemory();
 }
 
 // This function blocks the process, puts it at the end of the queue or the priority queue depending on the algorithm, and makes isRunning=false to begin another process.

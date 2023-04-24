@@ -1,6 +1,16 @@
 #include "headers.h"
 #include "scheduling_algorithms.h"
 
+void pushProcessToWaitingQueue(struct ProcessStruct process)
+{
+    if (process.id != -1)
+    {
+        struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
+                                                          process.runningTime,process.memSize);
+        enqueue(processWaitingQueue, newProcess);
+    }
+}
+
 void pushProcessToSRTN(struct ProcessStruct process)
 {
     if (process.id != -1)
@@ -30,7 +40,16 @@ void pushProcessToRR(struct ProcessStruct process)
         enqueue(queue, newProcess);
     }
 }
-
+bool firstFirstMemoryAllocation(struct ProcessStruct process){
+    return 1;           //replace by algorithm implementation
+}
+bool tryAllocatingMemory(struct ProcessStruct process){
+    if(memoryPolicy==1) //FirstFit
+        return firstFirstMemoryAllocation(process);
+    else {
+        return 1;       //change after implementing buddy memory allocation
+    }
+}
 void getProcess(int signum)
 {
     int rec_val = msgrcv(messageQueueID, &message, sizeof(message.process), 5, !IPC_NOWAIT);
@@ -46,22 +65,27 @@ void getProcess(int signum)
     switch (selectedAlgorithm)
     {
     case 1:
-        pushProcessToHPF(message.process);
+        if(tryAllocatingMemory(message.process)) pushProcessToHPF(message.process);
+        else pushProcessToWaitingQueue(message.process);
         break;
     case 2:
-        pushProcessToSRTN(message.process);
-        if (isRunning)
-        {
-            int tempRunningRime = runningProcess->remainingTime;
-            runningProcess->remainingTime = runningProcess->remainingTime - (getClk() - runningProcess->lastStopedTime);
-            if (message.process.runningTime < runningProcess->remainingTime)
-                blockProcess();
-            else
-                runningProcess->remainingTime = tempRunningRime;
+        if(tryAllocatingMemory(message.process)) {
+            pushProcessToSRTN(message.process);
+            if (isRunning)
+            {
+                int tempRunningRime = runningProcess->remainingTime;
+                runningProcess->remainingTime = runningProcess->remainingTime - (getClk() - runningProcess->lastStopedTime);
+                if (message.process.runningTime < runningProcess->remainingTime)
+                    blockProcess();
+                else
+                    runningProcess->remainingTime = tempRunningRime;
+            }
         }
+        else pushProcessToWaitingQueue(message.process);
         break;
     case 3:
-        pushProcessToRR(message.process);
+        if(tryAllocatingMemory(message.process)) pushProcessToRR(message.process);
+        else pushProcessToWaitingQueue(message.process);
         break;
     }
 
@@ -110,6 +134,8 @@ int main(int argc, char *argv[])
         memoryUsedQueue=createQueue();
         
     }
+
+    processWaitingQueue=createQueue(); //Queue containing processes that can't be allocated
 
     // Switch on the selected algorithm and allocate the appropriate data structure
     switch (selectedAlgorithm)
