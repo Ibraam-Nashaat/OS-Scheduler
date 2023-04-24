@@ -40,8 +40,29 @@ void pushProcessToRR(struct ProcessStruct process)
         enqueue(queue, newProcess);
     }
 }
-bool firstFirstMemoryAllocation(struct ProcessStruct process){
-    return 1;           //replace by algorithm implementation
+bool firstFitMemoryAllocation(struct ProcessStruct* process, struct sortedLinkedListNode* memoryList){
+
+    
+    struct sortedLinkedListNode* curr = memoryList;
+    while (curr != NULL) {
+        if (curr->data->size >= process->memSize) {
+            // Allocate the memory by updating the block's PID and splitting the block if necessary
+            curr->data->pid = process->pid;
+            if (curr->data->size > process->memSize) {
+                struct sortedLinkedListNode* newNode = (struct sortedLinkedListNode*) malloc(sizeof(struct sortedLinkedListNode));
+                newNode->data->pid = -1;
+                newNode->data->size = curr->data->size - process->memSize;
+                newNode->next = curr->next;
+                curr->data->size = process->memSize;
+                curr->next = newNode;
+            }
+            return true;
+        }
+        curr = curr->next;
+    }
+    // If no block is found, return false
+    return false;
+  //replace by algorithm implementation
 }
 bool tryAllocatingMemory(struct ProcessStruct process){
     if(memoryPolicy==1) //FirstFit
@@ -132,6 +153,8 @@ int main(int argc, char *argv[])
     if(memoryPolicy==1){
         memoryHoles=createSortedLinkedList();
         memoryUsed=createSortedLinkedList();
+        struct memoryNode * memoryNode=createMemoryNode(0,1024,-1);
+        insert(memoryHoles,memoryNode,0);
     }
 
     processWaitingQueue=createQueue(); //Queue containing processes that can't be allocated

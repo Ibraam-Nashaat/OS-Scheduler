@@ -50,7 +50,7 @@ void insert(struct sortedLinkedList *LL, struct memoryNode * memoryNode, int pri
     }
 }
 
-bool removeLinkedListNode(struct sortedLinkedListNode* node,struct sortedLinkedList* LL)
+struct sortedLinkedListNode* removeLinkedListNode(struct sortedLinkedListNode* node,struct sortedLinkedList* LL)
 {
     struct sortedLinkedListNode* current=LL->head;
     struct sortedLinkedListNode* previous=NULL;
@@ -58,19 +58,42 @@ bool removeLinkedListNode(struct sortedLinkedListNode* node,struct sortedLinkedL
         free(current);
         LL->head=NULL;
         LL->tail==NULL;
-        return true;
+        return current;
     }
     if(current!=NULL && current==node){
         LL->head=current->next;
         free(current);
-        return true;
+        return current;
     }
     while(current!=NULL && current!=node){
         previous=current;
         current=current->next;
     }
-    if(current==NULL) return false;
+    if(current==NULL) return NULL;
     previous->next=current->next;
     free(current);
-    return true;
+    return current;
+}
+struct sortedLinkedListNode* find(struct sortedLinkedListNode* headList, int pid) {
+    struct sortedLinkedListNode* curr = headList;
+    while (curr != NULL && curr->data->pid != pid) 
+    {
+        curr = curr->next;
+    }
+   
+    return curr;
+}
+struct sortedLinkedListNode* splitNode(struct sortedLinkedListNode* nodeToSplit,int memSize) {
+    // Create a new node with half the data of the original node
+    struct sortedLinkedListNode* newNode = (struct sortedLinkedListNode*) malloc(sizeof(struct sortedLinkedListNode));
+    newNode->data = nodeToSplit->data;
+    newNode->data->size=memSize;
+    newNode->data->endLocation=newNode->data->startLocation+memSize;
+    nodeToSplit->data->size=nodeToSplit->data->size-memSize;
+    nodeToSplit->data->startLocation=newNode->data->endLocation;
+
+    // Adjust the pointers to insert the new node between the original node and the next node
+    newNode->next = nodeToSplit;
+    // Return a pointer to the new node created by the split
+    return newNode;
 }

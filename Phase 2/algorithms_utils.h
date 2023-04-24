@@ -1,5 +1,5 @@
 #include "defines.h"
-
+#include"structs.h"
 int algorithmFlag = 1;
 int algorithmBlockingFlag = 1; // for handling processes that arrive at the same time
 int selectedAlgorithm, quantum,memoryPolicy;
@@ -50,10 +50,40 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
     runningProcess->startTime = getClk();
     runningProcess->lastStopedTime = getClk();
 }
-void deAllocateProcessMemory(){
+void deAllocateProcessMemory(struct ProcessStruct *process )
+{
+  struct sortedLinkedListNode* llNode= find(memoryUsed->head,process->pid);
+  struct sortedLinkedListNode* rmNode=removeLinkedListNode(llNode,memoryUsed);
+  rmNode->data->pid=-1;
+ // memoryHoles->head->data->size=memoryHoles->head->data->size -rmNode->data->size;
+  //memoryHoles->head->data->startLocation=memoryHoles->head->data->startLocation+rmNode->data->size;
+  insert(memoryHoles,rmNode->data,rmNode->data->startLocation);
 
+
+} 
+void reAllocateProcessMemory(struct ProcessStruct *Process){
+struct memoryNode * memNode=createMemoryNode(memoryHoles->head->data->startLocation,Process->memSize,Process->pid);
+struct sortedLinkedListNode* currNode=memoryHoles->head;
+while(memNode->size >currNode->data->size && currNode!=NULL )
+{
+currNode=currNode->next;
 }
-void reAllocateProcessMemory(){
+if(currNode ==NULL)
+{
+    printf("NO memory available\n");
+    return ;
+}
+if(memNode->size==currNode->data->size)
+{
+   struct sortedLinkedListNode* holedNode=removeLinkedListNode(currNode,memoryHoles);
+   insert (memoryUsed,memNode,Process->priority);
+}
+else{
+  struct sortedLinkedListNode* secCurrNode=splitNode(currNode,Process->memSize);
+  struct sortedLinkedListNode* holedNode=removeLinkedListNode(secCurrNode,memoryHoles);
+    
+    insert (memoryUsed,memNode,Process->priority);
+}
 
 }
 // This function terminates the process and frees the memory
@@ -65,8 +95,8 @@ void terminateProcess(int sigNum)
     runningProcess = NULL;
     isRunning = false;
     fflush(stdout);
-    deAllocateProcessMemory();
-    reAllocateProcessMemory();
+    deAllocateProcessMemory(runningProcess);
+    reAllocateProcessMemory(runningProcess);
 }
 
 // This function blocks the process, puts it at the end of the queue or the priority queue depending on the algorithm, and makes isRunning=false to begin another process.
