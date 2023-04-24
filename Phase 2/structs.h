@@ -47,3 +47,15 @@ struct Queue
 {
     struct Node *head, *tail;
 };
+
+struct sortedLinkedListNode
+{
+    struct memoryNode* data; // data of Node
+    struct sortedLinkedListNode *next;        // pointer for next Node
+    int priority;
+};
+
+struct sortedLinkedList
+{
+    struct sortedLinkedListNode *head, *tail;
+};

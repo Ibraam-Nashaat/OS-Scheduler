@@ -7,6 +7,8 @@ bool isRunning;
 struct msgBuff message;
 struct PQueue *priorityQueue;
 struct Queue *queue;
+struct PQueue *memoryHolesPriorityQueue;
+struct Queue *memoryUsedQueue;
 struct ProcessStruct *runningProcess = NULL;
 
 // Run a process with a given quantum time

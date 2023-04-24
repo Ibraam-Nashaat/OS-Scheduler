@@ -18,8 +18,7 @@ typedef short bool;
 #include "structs.h"
 #include "PQueue.h"
 #include "Queue.h"
-#include "first_fit.h"
-#include "buddy.h"
+#include "sortedLinkedList.h"
 #include "process_generator_tester.h"
 
 int messageQueueID;
@@ -178,3 +177,11 @@ struct ProcessStruct *create_process(int id, int arrivalTime, int priority, int 
     process->memSize=memSize;
     return process;
 }
+
+struct memoryNode* createMemoryNode(int startLocation,int size,int pid){
+    struct memoryNode *memoryNode=(struct memoryNode *)malloc(sizeof(struct memoryNode));
+    memoryNode->startLocation=startLocation;
+    memoryNode->endLocation=startLocation+size-1;
+    memoryNode->size=size;
+    memoryNode->pid=pid;
+};

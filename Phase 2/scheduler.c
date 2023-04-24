@@ -105,6 +105,11 @@ int main(int argc, char *argv[])
     memoryPolicy=atoi(argv[3]);
     printf("Selected Algorithm: %d\n", selectedAlgorithm);
     fflush(stdout);
+    if(memoryPolicy==1){
+        memoryHolesPriorityQueue=createPriorityQueue();
+        memoryUsedQueue=createQueue();
+        
+    }
 
     // Switch on the selected algorithm and allocate the appropriate data structure
     switch (selectedAlgorithm)
