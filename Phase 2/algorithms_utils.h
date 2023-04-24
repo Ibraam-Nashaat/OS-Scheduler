@@ -7,9 +7,8 @@ bool isRunning;
 struct msgBuff message;
 struct PQueue *priorityQueue;
 struct Queue *queue,*processWaitingQueue;
-struct PQueue *memoryHolesPriorityQueue;
-struct Queue *memoryUsedQueue;
 struct ProcessStruct *runningProcess = NULL;
+struct sortedLinkedList* memoryHoles, *memoryUsed;
 
 // Run a process with a given quantum time
 // currProcess: a pointer to the process structure
@@ -55,7 +54,7 @@ void deAllocateProcessMemory(){
 
 }
 void reAllocateProcessMemory(){
-    
+
 }
 // This function terminates the process and frees the memory
 // sigNum: the signal number for termination

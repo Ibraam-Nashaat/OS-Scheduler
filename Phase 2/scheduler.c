@@ -130,9 +130,8 @@ int main(int argc, char *argv[])
     printf("Selected Algorithm: %d\n", selectedAlgorithm);
     fflush(stdout);
     if(memoryPolicy==1){
-        memoryHolesPriorityQueue=createPriorityQueue();
-        memoryUsedQueue=createQueue();
-        
+        memoryHoles=createSortedLinkedList();
+        memoryUsed=createSortedLinkedList();
     }
 
     processWaitingQueue=createQueue(); //Queue containing processes that can't be allocated
