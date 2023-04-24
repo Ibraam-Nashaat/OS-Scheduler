@@ -50,6 +50,18 @@ int getSchedulingAlgoFromUser(int *algo)
     }
     return quantum;
 }
+int getMemoryAllocationPolicyFromUser(){
+    int memoryPolicy;
+    printf("Choose the memory allocation policy:\n");
+    printf("1- First Fit\n");
+    printf("2- Buddy memory allocation\n");
+    scanf("%d",&memoryPolicy);
+    while(memoryPolicy<1 || memoryPolicy>2){
+        printf("Enter 1 or 2:\n");
+        scanf("%d", &memoryPolicy);
+    }
+    return memoryPolicy;
+}
 
 void sendProcess(struct ProcessStruct *process)
 {
@@ -73,6 +85,7 @@ int main(int argc, char *argv[])
     // 2. Ask the user for the chosen scheduling algorithm and its parameters, if there are any.
     int algo;
     int quantum = getSchedulingAlgoFromUser(&algo);
+    int memoryPolicy=getMemoryAllocationPolicyFromUser();
 
     createSemaphore();
     createMessageQueue();
@@ -87,10 +100,11 @@ int main(int argc, char *argv[])
     schedulerPID = fork();
     if (schedulerPID == 0)
     {
-        char algoAsChar[13], quantumAsChar[13];
+        char algoAsChar[13], quantumAsChar[13],memoryPolicyAsChar[13];
         sprintf(algoAsChar, "%d", algo);
         sprintf(quantumAsChar, "%d", quantum);
-        char *args[] = {"./scheduler.out", algoAsChar, quantumAsChar, NULL};
+        sprintf(memoryPolicyAsChar,"%d",memoryPolicy);
+        char *args[] = {"./scheduler.out", algoAsChar, quantumAsChar,memoryPolicyAsChar, NULL};
         execvp(args[0], args);
     }
     // 4. Use this function after creating the clock process to initialize clock

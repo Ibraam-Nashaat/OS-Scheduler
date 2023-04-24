@@ -102,6 +102,7 @@ int main(int argc, char *argv[])
 
     // Get the selected algorithm from the command line argument
     selectedAlgorithm = atoi(argv[1]);
+    memoryPolicy=atoi(argv[3]);
     printf("Selected Algorithm: %d\n", selectedAlgorithm);
     fflush(stdout);
 

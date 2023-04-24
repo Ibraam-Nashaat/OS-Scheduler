@@ -18,6 +18,8 @@ typedef short bool;
 #include "structs.h"
 #include "PQueue.h"
 #include "Queue.h"
+#include "first_fit.h"
+#include "buddy.h"
 #include "process_generator_tester.h"
 
 int messageQueueID;
