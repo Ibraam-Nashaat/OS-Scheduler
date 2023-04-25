@@ -1,14 +1,14 @@
 #include "defines.h"
-#include"structs.h"
+#include "structs.h"
 int algorithmFlag = 1;
 int algorithmBlockingFlag = 1; // for handling processes that arrive at the same time
-int selectedAlgorithm, quantum,memoryPolicy;
+int selectedAlgorithm, quantum, memoryPolicy;
 bool isRunning;
 struct msgBuff message;
 struct PQueue *priorityQueue;
-struct Queue *queue,*processWaitingQueue;
+struct Queue *queue, *processWaitingQueue;
 struct ProcessStruct *runningProcess = NULL;
-struct sortedLinkedList* memoryHoles, *memoryUsed;
+struct sortedLinkedList *memoryHoles, *memoryUsed;
 
 // Run a process with a given quantum time
 // currProcess: a pointer to the process structure
@@ -50,47 +50,50 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
     runningProcess->startTime = getClk();
     runningProcess->lastStopedTime = getClk();
 }
-void deAllocateProcessMemory(struct ProcessStruct *process )
+void deAllocateProcessMemory(struct ProcessStruct *process)
 {
-  struct memoryNode* memoryRemovedNode;
-  struct sortedLinkedListNode* llNode= find(memoryUsed->head,process->pid);
-if(!isEmptyLL(memoryUsed)){  
-  memoryRemovedNode=removeLinkedListNode(llNode,memoryUsed);}
-if(memoryRemovedNode==NULL)
-{
-    printf("null\n");
-    return ;
-}
-    memoryRemovedNode->pid=-1;
- 
-   insert(memoryHoles,memoryRemovedNode,memoryRemovedNode->startLocation);
+    struct memoryNode *memoryRemovedNode;
+    struct sortedLinkedListNode *llNode = find(memoryUsed->head, process->pid);
+    if (!isEmptyLL(memoryUsed))
+    {
+        memoryRemovedNode = removeLinkedListNode(llNode, memoryUsed);
+    }
+    if (memoryRemovedNode == NULL)
+    {
+        printf("null\n");
+        return;
+    }
+    memoryRemovedNode->pid = -1;
 
-}
-
-void reAllocateProcessMemory(struct ProcessStruct *Process){
-struct memoryNode * memNode=createMemoryNode(memoryHoles->head->data->startLocation,Process->memSize,Process->pid);
-struct sortedLinkedListNode* currNode=memoryHoles->head;
-while(memNode->size >currNode->data->size && currNode!=NULL )
-{
-currNode=currNode->next;
-}
-if(currNode ==NULL)
-{
-    printf("NO memory available\n");
-    return ;
-}
-if(memNode->size==currNode->data->size)
-{
-   //struct sortedLinkedListNode* holedNode=removeLinkedListNode(currNode,memoryHoles);
-   insert (memoryUsed,memNode,Process->priority);
-}
-else{
-  struct sortedLinkedListNode* secCurrNode=splitNode(currNode,Process->memSize);
- // struct sortedLinkedListNode* holedNode=removeLinkedListNode(secCurrNode,memoryHoles);
-
-    insert (memoryUsed,memNode,Process->priority);
+    insert(memoryHoles, memoryRemovedNode, memoryRemovedNode->startLocation);
+    mergeHoles(memoryHoles);
 }
 
+void reAllocateProcessMemory(struct ProcessStruct *Process)
+{
+    struct memoryNode *memNode = createMemoryNode(memoryHoles->head->data->startLocation, Process->memSize, Process->pid);
+    struct sortedLinkedListNode *currNode = memoryHoles->head;
+    while (memNode->size > currNode->data->size && currNode != NULL)
+    {
+        currNode = currNode->next;
+    }
+    if (currNode == NULL)
+    {
+        printf("NO memory available\n");
+        return;
+    }
+    if (memNode->size == currNode->data->size)
+    {
+        // struct sortedLinkedListNode* holedNode=removeLinkedListNode(currNode,memoryHoles);
+        insert(memoryUsed, memNode, Process->priority);
+    }
+    else
+    {
+        struct sortedLinkedListNode *secCurrNode = splitNode(currNode, Process->memSize);
+        // struct sortedLinkedListNode* holedNode=removeLinkedListNode(secCurrNode,memoryHoles);
+
+        insert(memoryUsed, memNode, Process->priority);
+    }
 }
 // This function terminates the process and frees the memory
 // sigNum: the signal number for termination

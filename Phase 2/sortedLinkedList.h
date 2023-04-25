@@ -116,35 +116,34 @@ struct sortedLinkedListNode *splitNode(struct sortedLinkedListNode *nodeToSplit,
     // Modify nodeToSplit data
     nodeToSplit->data->size = nodeToSplit->data->size - memSize;
     nodeToSplit->data->startLocation = newNode->data->endLocation;
-    nodeToSplit->priority=nodeToSplit->data->startLocation;
+    nodeToSplit->priority = nodeToSplit->data->startLocation;
     // Adjust the pointers to insert the new node between the original node and the next node
     newNode->next = nodeToSplit;
     // Return a pointer to the new node created by the split
     return newNode;
 }
-void mergeTwoNodes(struct sortedLinkedListNode * node1, struct sortedLinkedListNode * node2)
+void mergeTwoNodes(struct sortedLinkedListNode *node1, struct sortedLinkedListNode *node2)
 {
-     // If either node is NULL, return
-     if(node1->data->endLocation==node2->data->startLocation-1)
-     {
-    if (node1 == NULL || node2 == NULL) {
+    // If either node is NULL, return
+    if (node1 == NULL || node2 == NULL)
+    {
         return;
     }
-    node1->data->size=node1->data->size+node2->data->size;
-    node1->data->endLocation=node2->data->endLocation;
-    node1->next=node2->next;
-
-}
-}
-void mergeHoles(struct sortedLinkedList * LL)
-{
-    
-   struct sortedLinkedListNode *  firstNode=LL->head;
-   struct sortedLinkedListNode * secNode=LL->head->next;
-    while(secNode!=NULL)
+    if (node1->data->endLocation == node2->data->startLocation - 1)
     {
-        mergeTwoNodes(firstNode,secNode);
-        firstNode=firstNode->next;
-        secNode=secNode->next;
+        node1->data->size = node1->data->size + node2->data->size;
+        node1->data->endLocation = node2->data->endLocation;
+        node1->next = node2->next;
+    }
+}
+void mergeHoles(struct sortedLinkedList *LL)
+{
+    struct sortedLinkedListNode *firstNodePtr = LL->head;
+    struct sortedLinkedListNode *secNodePtr = firstNodePtr->next;
+    while (secNodePtr != NULL)
+    {
+        mergeTwoNodes(firstNodePtr, secNodePtr);
+        firstNodePtr = firstNodePtr->next;
+        secNodePtr = secNodePtr->next;
     }
 }
