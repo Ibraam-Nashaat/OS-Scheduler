@@ -52,7 +52,9 @@ void insert(struct sortedLinkedList *LL, struct memoryNode * memoryNode, int pri
 
 struct memoryNode* removeLinkedListNode(struct sortedLinkedListNode* node,struct sortedLinkedList* LL)
 {
+
     struct sortedLinkedListNode* current=LL->head;
+
     struct sortedLinkedListNode* previous=NULL;
     struct memoryNode* mem;
     if(current!=NULL && current->next==NULL){
@@ -63,16 +65,23 @@ struct memoryNode* removeLinkedListNode(struct sortedLinkedListNode* node,struct
         return mem;
     }
     if(current!=NULL && current==node){
+
         LL->head=current->next;
         mem=current->data;
         free(current);
         return mem;
     }
+
     while(current!=NULL && current!=node){
+
         previous=current;
+
         current=current->next;
+
     }
-    if(current==NULL) return NULL;
+
+    if(current==NULL) return false;
+
     previous->next=current->next;
     mem=current->data;
     free(current);

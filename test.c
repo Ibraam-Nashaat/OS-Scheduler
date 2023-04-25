@@ -5,8 +5,10 @@
 #include <unistd.h>
 #include <signal.h>
 #include <string.h>
-
+#define true 1
+#define false 0
 typedef short bool;
+
 struct ProcessStruct
 {
     int id,
@@ -169,6 +171,7 @@ if(currNode ==NULL)
 if(memNode->size==currNode->data->size)
 {
    removeLinkedListNode(currNode,memoryHoles);
+   removeLinkedListNode(currNode,memoryHoles);
    insert (memoryUsed,memNode,Process->priority);
 }
 else{
@@ -219,7 +222,7 @@ struct ProcessStruct* process = (struct ProcessStruct*) malloc(sizeof(struct Pro
     }
     struct ProcessStruct* process2 = (struct ProcessStruct*) malloc(sizeof(struct ProcessStruct));
     process2->pid = 2;
-    process2->memSize = 10;
+    process2->memSize = 49;
     process2->priority = 2;
 
     // Call the reAllocateProcessMemory function again
@@ -252,8 +255,6 @@ while(testNode1 !=NULL)
 
 }
 
-printf("reintialize ");
-fflush(stdout);
 testNode=memoryHoles->head;
 testNode1=memoryUsed->head;
 printf("deallcotion ");
