@@ -50,20 +50,23 @@ void insert(struct sortedLinkedList *LL, struct memoryNode * memoryNode, int pri
     }
 }
 
-struct sortedLinkedListNode* removeLinkedListNode(struct sortedLinkedListNode* node,struct sortedLinkedList* LL)
+struct memoryNode* removeLinkedListNode(struct sortedLinkedListNode* node,struct sortedLinkedList* LL)
 {
     struct sortedLinkedListNode* current=LL->head;
     struct sortedLinkedListNode* previous=NULL;
+    struct memoryNode* mem;
     if(current!=NULL && current->next==NULL){
+        mem=current->data;
         free(current);
         LL->head=NULL;
         LL->tail==NULL;
-        return current;
+        return mem;
     }
     if(current!=NULL && current==node){
         LL->head=current->next;
+        mem=current->data;
         free(current);
-        return current;
+        return mem;
     }
     while(current!=NULL && current!=node){
         previous=current;
@@ -71,8 +74,9 @@ struct sortedLinkedListNode* removeLinkedListNode(struct sortedLinkedListNode* n
     }
     if(current==NULL) return NULL;
     previous->next=current->next;
+    mem=current->data;
     free(current);
-    return current;
+    return mem;
 }
 //find node by its pid
 struct sortedLinkedListNode* find(struct sortedLinkedListNode* headList, int pid) {
