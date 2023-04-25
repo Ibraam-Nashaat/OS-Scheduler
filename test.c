@@ -1,5 +1,12 @@
+#include <stdio.h>
+#include <stdlib.h>
 #define NULL ((void *)0)
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
+#include <string.h>
 
+typedef short bool;
 struct ProcessStruct
 {
     int id,
@@ -42,6 +49,13 @@ struct sortedLinkedListNode*newSortedLLNode(struct memoryNode * memoryNode, int 
     return temp;
 }
 
+struct memoryNode* createMemoryNode(int startLocation,int size,int pid){
+    struct memoryNode *memoryNode=(struct memoryNode *)malloc(sizeof(struct memoryNode));
+    memoryNode->startLocation=startLocation;
+    memoryNode->endLocation=startLocation+size-1;
+    memoryNode->size=size;
+    memoryNode->pid=pid;
+};
 struct sortedLinkedList *createSortedLinkedList()
 {
     struct sortedLinkedList *LL = (struct sortedLinkedList *)malloc(sizeof(struct sortedLinkedList));
@@ -83,36 +97,42 @@ void insert(struct sortedLinkedList *LL, struct memoryNode * memoryNode, int pri
 
 struct sortedLinkedListNode* removeLinkedListNode(struct sortedLinkedListNode* node,struct sortedLinkedList* LL)
 {
-    struct sortedLinkedListNode* current=LL->head;
-    struct sortedLinkedListNode* previous=NULL;
-    if(current!=NULL && current->next==NULL){
-        free(current);
-        LL->head=NULL;
-        LL->tail==NULL;
-        return current;
+    // If either the head or node to be deleted is NULL, return
+    if (LL == NULL || node == NULL) {
+        return NULL;
     }
-    if(current!=NULL && current==node){
-        LL->head=current->next;
-        free(current);
-        return current;
+    
+      if (LL->head == node) {
+        LL->head = node->next;
+        node->next = NULL;
+        return node;
     }
-    while(current!=NULL && current!=node){
-        previous=current;
-        current=current->next;
+    
+    // Traverse the linked list to find the node before the node to be deleted
+    struct sortedLinkedListNode* prev = LL->head;
+    while (prev->next != NULL && prev->next != node) {
+        prev = prev->next;
     }
-    if(current==NULL) return NULL;
-    previous->next=current->next;
-    free(current);
-    return current;
+    
+    // If the node to be deleted was not found, return NULL
+    if (prev->next == NULL) {
+        return NULL;
+    }
+    
+    // Update the previous node's next pointer to skip over the deleted node
+    prev->next = node->next;
+    node->next = NULL;
+    return node;
 }
+
 //find node by its pid
 struct sortedLinkedListNode* find(struct sortedLinkedListNode* headList, int pid) {
     struct sortedLinkedListNode* curr = headList;
-    while (curr != NULL && curr->data->pid != pid) 
+    while (curr != NULL && curr->data->pid != pid)
     {
         curr = curr->next;
     }
-   
+
     return curr;
 }
 //split node to two nodes sequential
@@ -126,7 +146,7 @@ struct sortedLinkedListNode* splitNode(struct sortedLinkedListNode* nodeToSplit,
     newNode->priority=nodeToSplit->priority;
     newNode->data->size=memSize;
     newNode->data->endLocation=newNode->data->startLocation+memSize;
-    //Modify nodeToSplit data  
+    //Modify nodeToSplit data
     nodeToSplit->data->size=nodeToSplit->data->size-memSize;
     nodeToSplit->data->startLocation=newNode->data->endLocation;
 
@@ -154,12 +174,33 @@ if(memNode->size==currNode->data->size)
 }
 else{
   struct sortedLinkedListNode* secCurrNode=splitNode(currNode,Process->memSize);
-  struct sortedLinkedListNode* holedNode=removeLinkedListNode(secCurrNode,memoryHoles);
-    
+ // struct sortedLinkedListNode* holedNode=removeLinkedListNode(secCurrNode,memoryHoles);
+
     insert (memoryUsed,memNode,Process->priority);
 }
 
 }
+bool isEmptyLL(struct sortedLinkedList *LL)
+{
+    return (LL->head == NULL);
+}
+
+void deAllocateProcessMemory(struct ProcessStruct *process )
+{
+  struct sortedLinkedListNode* rmNode;
+  struct sortedLinkedListNode* llNode= find(memoryUsed->head,process->pid);
+if(!isEmptyLL(memoryUsed)){  
+  rmNode=removeLinkedListNode(llNode,memoryUsed);}
+if(rmNode==NULL)
+{
+    printf("null");
+}
+  llNode->data->pid=-1;
+ // memoryHoles->head->data->size=memoryHoles->head->data->size -rmNode->data->size;
+  //memoryHoles->head->data->startLocation=memoryHoles->head->data->startLocation+rmNode->data->size;
+  insert(memoryHoles,llNode->data,llNode->data->startLocation);
+}
+
 int main()
 {
   memoryHoles=createSortedLinkedList();
@@ -176,7 +217,68 @@ struct ProcessStruct* process = (struct ProcessStruct*) malloc(sizeof(struct Pro
     } else {
         printf("Error allocating memory\n");
     }
+    struct ProcessStruct* process2 = (struct ProcessStruct*) malloc(sizeof(struct ProcessStruct));
+    process2->pid = 2;
+    process2->memSize = 10;
+    process2->priority = 2;
+
+    // Call the reAllocateProcessMemory function again
+    reAllocateProcessMemory(process2);
+     if (memoryHoles->head->data->size == 40) {
+        printf("Memory split and allocated to process\n");
+    } else {
+        printf("Error splitting and allocating memory\n");
+    }
+
+struct sortedLinkedListNode* testNode=memoryHoles->head;
+while(testNode !=NULL)
+{
+    printf("memoryHoles \n");
+     printf("%d\n",testNode->data->size);
+  //  printf("%d\n",testNode->data->startLocation);
+
+     testNode=testNode->next;
+}
+struct sortedLinkedListNode* testNode1=memoryUsed->head;
+
+  printf("memoryUsed \n");
+while(testNode1 !=NULL)
+{
+
+     printf("%d\n",testNode1->data->size);
+//    printf("%d\n",testNode1->data->startLocation);
+     testNode1=testNode1->next;
 
 
+}
+
+printf("reintialize ");
+fflush(stdout);
+testNode=memoryHoles->head;
+testNode1=memoryUsed->head;
+printf("deallcotion ");
+fflush(stdout);
+//deAllocateProcessMemory(process);
+deAllocateProcessMemory(process2);
+printf("deallcotion ");
+fflush(stdout);
+printf("memoryHoles \n");
+
+while(testNode !=NULL)
+{
+     printf("%d\n",testNode->data->size);
+   // printf("%d\n",testNode->data->startLocation);
+
+     testNode=testNode->next;
+}
+       printf("memoryUsed \n");
+
+while(testNode1 !=NULL)
+{
+
+     printf("%d\n",testNode1->data->size);
+//    printf("%d\n",testNode1->data->startLocation);
+     testNode1=testNode1->next;
+}
     return 0;
 }
