@@ -95,34 +95,33 @@ void insert(struct sortedLinkedList *LL, struct memoryNode * memoryNode, int pri
     }
 }
 
-struct sortedLinkedListNode* removeLinkedListNode(struct sortedLinkedListNode* node,struct sortedLinkedList* LL)
+struct memoryNode* removeLinkedListNode(struct sortedLinkedListNode* node,struct sortedLinkedList* LL)
 {
-    // If either the head or node to be deleted is NULL, return
-    if (LL == NULL || node == NULL) {
-        return NULL;
+    struct sortedLinkedListNode* current=LL->head;
+    struct sortedLinkedListNode* previous=NULL;
+    struct memoryNode* mem;
+    if(current!=NULL && current->next==NULL){
+        mem=current->data;
+        free(current);
+        LL->head=NULL;
+        LL->tail==NULL;
+        return mem;
     }
-    
-      if (LL->head == node) {
-        LL->head = node->next;
-        node->next = NULL;
-        return node;
+    if(current!=NULL && current==node){
+        LL->head=current->next;
+        mem=current->data;
+        free(current);
+        return mem;
     }
-    
-    // Traverse the linked list to find the node before the node to be deleted
-    struct sortedLinkedListNode* prev = LL->head;
-    while (prev->next != NULL && prev->next != node) {
-        prev = prev->next;
+    while(current!=NULL && current!=node){
+        previous=current;
+        current=current->next;
     }
-    
-    // If the node to be deleted was not found, return NULL
-    if (prev->next == NULL) {
-        return NULL;
-    }
-    
-    // Update the previous node's next pointer to skip over the deleted node
-    prev->next = node->next;
-    node->next = NULL;
-    return node;
+    if(current==NULL) return NULL;
+    previous->next=current->next;
+    mem=current->data;
+    free(current);
+    return mem;
 }
 
 //find node by its pid
@@ -169,7 +168,7 @@ if(currNode ==NULL)
 }
 if(memNode->size==currNode->data->size)
 {
-   struct sortedLinkedListNode* holedNode=removeLinkedListNode(currNode,memoryHoles);
+   removeLinkedListNode(currNode,memoryHoles);
    insert (memoryUsed,memNode,Process->priority);
 }
 else{
@@ -187,18 +186,19 @@ bool isEmptyLL(struct sortedLinkedList *LL)
 
 void deAllocateProcessMemory(struct ProcessStruct *process )
 {
-  struct sortedLinkedListNode* rmNode;
+  struct memoryNode* rmNode;
   struct sortedLinkedListNode* llNode= find(memoryUsed->head,process->pid);
 if(!isEmptyLL(memoryUsed)){  
   rmNode=removeLinkedListNode(llNode,memoryUsed);}
 if(rmNode==NULL)
 {
     printf("null");
-}
-  llNode->data->pid=-1;
+
+    rmNode->pid=-1;
  // memoryHoles->head->data->size=memoryHoles->head->data->size -rmNode->data->size;
   //memoryHoles->head->data->startLocation=memoryHoles->head->data->startLocation+rmNode->data->size;
-  insert(memoryHoles,llNode->data,llNode->data->startLocation);
+  insert(memoryHoles,rmNode,rmNode->startLocation);
+}
 }
 
 int main()
@@ -258,7 +258,7 @@ testNode=memoryHoles->head;
 testNode1=memoryUsed->head;
 printf("deallcotion ");
 fflush(stdout);
-//deAllocateProcessMemory(process);
+deAllocateProcessMemory(process);
 deAllocateProcessMemory(process2);
 printf("deallcotion ");
 fflush(stdout);
@@ -273,9 +273,11 @@ while(testNode !=NULL)
 }
        printf("memoryUsed \n");
 
+testNode1=memoryUsed->head;
 while(testNode1 !=NULL)
 {
-
+    printf("hamada");
+    fflush(stdout);
      printf("%d\n",testNode1->data->size);
 //    printf("%d\n",testNode1->data->startLocation);
      testNode1=testNode1->next;
