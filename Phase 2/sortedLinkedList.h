@@ -83,15 +83,18 @@ struct sortedLinkedListNode* find(struct sortedLinkedListNode* headList, int pid
    
     return curr;
 }
+//split node to two nodes sequential
 struct sortedLinkedListNode* splitNode(struct sortedLinkedListNode* nodeToSplit,int memSize) {
-    // Create a new node with half the data of the original node
+    // Create a new node with part the data of the original node
     struct sortedLinkedListNode* newNode = (struct sortedLinkedListNode*) malloc(sizeof(struct sortedLinkedListNode));
+    //alocate memoryNode -->data of LLNode
     newNode->data = (struct memoryNode*) malloc(sizeof(struct memoryNode));
     newNode->data->startLocation = nodeToSplit->data->startLocation;
     newNode->data->pid=nodeToSplit->data->pid;
     newNode->priority=nodeToSplit->priority;
     newNode->data->size=memSize;
     newNode->data->endLocation=newNode->data->startLocation+memSize;
+    //Modify nodeToSplit data  
     nodeToSplit->data->size=nodeToSplit->data->size-memSize;
     nodeToSplit->data->startLocation=newNode->data->endLocation;
 
