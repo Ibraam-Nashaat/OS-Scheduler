@@ -58,8 +58,6 @@ void deAllocateProcessMemory(struct ProcessStruct *process )
  // memoryHoles->head->data->size=memoryHoles->head->data->size -rmNode->data->size;
   //memoryHoles->head->data->startLocation=memoryHoles->head->data->startLocation+rmNode->data->size;
   insert(memoryHoles,rmNode->data,rmNode->data->startLocation);
-
-
 } 
 void reAllocateProcessMemory(struct ProcessStruct *Process){
 struct memoryNode * memNode=createMemoryNode(memoryHoles->head->data->startLocation,Process->memSize,Process->pid);
@@ -75,13 +73,13 @@ if(currNode ==NULL)
 }
 if(memNode->size==currNode->data->size)
 {
-   struct sortedLinkedListNode* holedNode=removeLinkedListNode(currNode,memoryHoles);
+   //struct sortedLinkedListNode* holedNode=removeLinkedListNode(currNode,memoryHoles);
    insert (memoryUsed,memNode,Process->priority);
 }
 else{
   struct sortedLinkedListNode* secCurrNode=splitNode(currNode,Process->memSize);
-  struct sortedLinkedListNode* holedNode=removeLinkedListNode(secCurrNode,memoryHoles);
-    
+ // struct sortedLinkedListNode* holedNode=removeLinkedListNode(secCurrNode,memoryHoles);
+
     insert (memoryUsed,memNode,Process->priority);
 }
 
