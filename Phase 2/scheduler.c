@@ -40,33 +40,19 @@ void pushProcessToRR(struct ProcessStruct process)
         enqueue(queue, newProcess);
     }
 }
-bool firstFitMemoryAllocation(struct ProcessStruct* process, struct sortedLinkedListNode* memoryList){
-
-    
-    struct sortedLinkedListNode* curr = memoryList;
-    while (curr != NULL) {
-        if (curr->data->size >= process->memSize) {
-            // Allocate the memory by updating the block's PID and splitting the block if necessary
-            curr->data->pid = process->pid;
-            if (curr->data->size > process->memSize) {
-                struct sortedLinkedListNode* newNode = (struct sortedLinkedListNode*) malloc(sizeof(struct sortedLinkedListNode));
-                newNode->data->pid = -1;
-                newNode->data->size = curr->data->size - process->memSize;
-                newNode->next = curr->next;
-                curr->data->size = process->memSize;
-                curr->next = newNode;
-            }
-            return true;
-        }
-        curr = curr->next;
+bool firstFitMemoryAllocation(struct ProcessStruct process){
+struct ProcessStruct* ptrProcess=&process;
+    if(process.memSize<memoryHoles->head->data->size)
+    {
+        reAllocateProcessMemory(ptrProcess);
+        return 1;
     }
-    // If no block is found, return false
-    return false;
+    else return 0;
   //replace by algorithm implementation
 }
 bool tryAllocatingMemory(struct ProcessStruct process){
     if(memoryPolicy==1) //FirstFit
-        return firstFirstMemoryAllocation(process);
+        return firstFitMemoryAllocation(process);
     else {
         return 1;       //change after implementing buddy memory allocation
     }
