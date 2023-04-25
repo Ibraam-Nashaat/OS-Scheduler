@@ -74,6 +74,7 @@ struct sortedLinkedListNode* removeLinkedListNode(struct sortedLinkedListNode* n
     free(current);
     return current;
 }
+//find node by its pid
 struct sortedLinkedListNode* find(struct sortedLinkedListNode* headList, int pid) {
     struct sortedLinkedListNode* curr = headList;
     while (curr != NULL && curr->data->pid != pid) 
