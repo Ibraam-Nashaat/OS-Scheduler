@@ -1,8 +1,8 @@
 #define NULL ((void *)0)
 
-struct sortedLinkedListNode*newSortedLLNode(struct memoryNode * memoryNode, int priority)
+struct sortedLinkedListNode *newSortedLLNode(struct memoryNode *memoryNode, int priority)
 {
-    struct sortedLinkedListNode*temp = (struct sortedLinkedListNode*)malloc(sizeof(struct sortedLinkedListNode));
+    struct sortedLinkedListNode *temp = (struct sortedLinkedListNode *)malloc(sizeof(struct sortedLinkedListNode));
     temp->data = memoryNode;
     temp->next = NULL;
     temp->priority = priority;
@@ -23,10 +23,10 @@ bool isEmptyLL(struct sortedLinkedList *LL)
 }
 
 // enQueue method-> add node to Queue
-void insert(struct sortedLinkedList *LL, struct memoryNode * memoryNode, int priority)
+void insert(struct sortedLinkedList *LL, struct memoryNode *memoryNode, int priority)
 {
-    struct sortedLinkedListNode*LLnodeHead = LL->head;
-    struct sortedLinkedListNode*nNode = newSortedLLNode(memoryNode, priority);
+    struct sortedLinkedListNode *LLnodeHead = LL->head;
+    struct sortedLinkedListNode *nNode = newSortedLLNode(memoryNode, priority);
     // codition if queue is empty
     if (LL->head == NULL)
     {
@@ -50,70 +50,101 @@ void insert(struct sortedLinkedList *LL, struct memoryNode * memoryNode, int pri
     }
 }
 
-struct memoryNode* removeLinkedListNode(struct sortedLinkedListNode* node,struct sortedLinkedList* LL)
+struct memoryNode *removeLinkedListNode(struct sortedLinkedListNode *node, struct sortedLinkedList *LL)
 {
 
-    struct sortedLinkedListNode* current=LL->head;
+    struct sortedLinkedListNode *current = LL->head;
 
-    struct sortedLinkedListNode* previous=NULL;
-    struct memoryNode* mem;
-    if(current!=NULL && current->next==NULL){
-        mem=current->data;
+    struct sortedLinkedListNode *previous = NULL;
+    struct memoryNode *mem;
+    if (current != NULL && current->next == NULL)
+    {
+        mem = current->data;
         free(current);
-        LL->head=NULL;
-        LL->tail==NULL;
+        LL->head = NULL;
+        LL->tail == NULL;
         return mem;
     }
-    if(current!=NULL && current==node){
+    if (current != NULL && current == node)
+    {
 
-        LL->head=current->next;
-        mem=current->data;
+        LL->head = current->next;
+        mem = current->data;
         free(current);
         return mem;
     }
 
-    while(current!=NULL && current!=node){
+    while (current != NULL && current != node)
+    {
 
-        previous=current;
+        previous = current;
 
-        current=current->next;
-
+        current = current->next;
     }
 
-    if(current==NULL) return false;
+    if (current == NULL)
+        return false;
 
-    previous->next=current->next;
-    mem=current->data;
+    previous->next = current->next;
+    mem = current->data;
     free(current);
     return mem;
 }
-//find node by its pid
-struct sortedLinkedListNode* find(struct sortedLinkedListNode* headList, int pid) {
-    struct sortedLinkedListNode* curr = headList;
-    while (curr != NULL && curr->data->pid != pid) 
+// find node by its pid
+struct sortedLinkedListNode *find(struct sortedLinkedListNode *headList, int pid)
+{
+    struct sortedLinkedListNode *curr = headList;
+    while (curr != NULL && curr->data->pid != pid)
     {
         curr = curr->next;
     }
-   
+
     return curr;
 }
-//split node to two nodes sequential
-struct sortedLinkedListNode* splitNode(struct sortedLinkedListNode* nodeToSplit,int memSize) {
+// split node to two nodes sequential
+struct sortedLinkedListNode *splitNode(struct sortedLinkedListNode *nodeToSplit, int memSize)
+{
     // Create a new node with part the data of the original node
-    struct sortedLinkedListNode* newNode = (struct sortedLinkedListNode*) malloc(sizeof(struct sortedLinkedListNode));
-    //alocate memoryNode -->data of LLNode
-    newNode->data = (struct memoryNode*) malloc(sizeof(struct memoryNode));
+    struct sortedLinkedListNode *newNode = (struct sortedLinkedListNode *)malloc(sizeof(struct sortedLinkedListNode));
+    // alocate memoryNode -->data of LLNode
+    newNode->data = (struct memoryNode *)malloc(sizeof(struct memoryNode));
     newNode->data->startLocation = nodeToSplit->data->startLocation;
-    newNode->data->pid=nodeToSplit->data->pid;
-    newNode->priority=nodeToSplit->priority;
-    newNode->data->size=memSize;
-    newNode->data->endLocation=newNode->data->startLocation+memSize;
-    //Modify nodeToSplit data  
-    nodeToSplit->data->size=nodeToSplit->data->size-memSize;
-    nodeToSplit->data->startLocation=newNode->data->endLocation;
-
+    newNode->data->pid = nodeToSplit->data->pid;
+    newNode->priority = nodeToSplit->priority;
+    newNode->data->size = memSize;
+    newNode->data->endLocation = newNode->data->startLocation + memSize;
+    // Modify nodeToSplit data
+    nodeToSplit->data->size = nodeToSplit->data->size - memSize;
+    nodeToSplit->data->startLocation = newNode->data->endLocation;
+    nodeToSplit->priority=nodeToSplit->data->startLocation;
     // Adjust the pointers to insert the new node between the original node and the next node
     newNode->next = nodeToSplit;
     // Return a pointer to the new node created by the split
     return newNode;
+}
+void mergeTwoNodes(struct sortedLinkedListNode * node1, struct sortedLinkedListNode * node2)
+{
+     // If either node is NULL, return
+     if(node1->data->endLocation==node2->data->startLocation-1)
+     {
+    if (node1 == NULL || node2 == NULL) {
+        return;
+    }
+    node1->data->size=node1->data->size+node2->data->size;
+    node1->data->endLocation=node2->data->endLocation;
+    node1->next=node2->next;
+
+}
+}
+void mergeHoles(struct sortedLinkedList * LL)
+{
+    
+   struct sortedLinkedListNode *  firstNode=LL->head;
+   struct sortedLinkedListNode * secNode=LL->head->next;
+    while(secNode!=NULL)
+    {
+        mergeTwoNodes(firstNode,secNode);
+        firstNode=firstNode->next;
+        secNode=secNode->next;
+    }
 }

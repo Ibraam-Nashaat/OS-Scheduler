@@ -137,20 +137,21 @@ struct sortedLinkedListNode* find(struct sortedLinkedListNode* headList, int pid
     return curr;
 }
 //split node to two nodes sequential
-struct sortedLinkedListNode* splitNode(struct sortedLinkedListNode* nodeToSplit,int memSize) {
+struct sortedLinkedListNode *splitNode(struct sortedLinkedListNode *nodeToSplit, int memSize)
+{
     // Create a new node with part the data of the original node
-    struct sortedLinkedListNode* newNode = (struct sortedLinkedListNode*) malloc(sizeof(struct sortedLinkedListNode));
-    //alocate memoryNode -->data of LLNode
-    newNode->data = (struct memoryNode*) malloc(sizeof(struct memoryNode));
+    struct sortedLinkedListNode *newNode = (struct sortedLinkedListNode *)malloc(sizeof(struct sortedLinkedListNode));
+    // alocate memoryNode -->data of LLNode
+    newNode->data = (struct memoryNode *)malloc(sizeof(struct memoryNode));
     newNode->data->startLocation = nodeToSplit->data->startLocation;
-    newNode->data->pid=nodeToSplit->data->pid;
-    newNode->priority=nodeToSplit->priority;
-    newNode->data->size=memSize;
-    newNode->data->endLocation=newNode->data->startLocation+memSize;
-    //Modify nodeToSplit data
-    nodeToSplit->data->size=nodeToSplit->data->size-memSize;
-    nodeToSplit->data->startLocation=newNode->data->endLocation;
-
+    newNode->data->pid = nodeToSplit->data->pid;
+    newNode->priority = nodeToSplit->priority;
+    newNode->data->size = memSize;
+    newNode->data->endLocation = newNode->data->startLocation + memSize;
+    // Modify nodeToSplit data
+    nodeToSplit->data->size = nodeToSplit->data->size - memSize;
+    nodeToSplit->data->startLocation = newNode->data->endLocation;
+    nodeToSplit->priority=nodeToSplit->data->startLocation;
     // Adjust the pointers to insert the new node between the original node and the next node
     newNode->next = nodeToSplit;
     // Return a pointer to the new node created by the split
@@ -171,7 +172,6 @@ if(currNode ==NULL)
 if(memNode->size==currNode->data->size)
 {
    removeLinkedListNode(currNode,memoryHoles);
-   removeLinkedListNode(currNode,memoryHoles);
    insert (memoryUsed,memNode,Process->priority);
 }
 else{
@@ -186,22 +186,48 @@ bool isEmptyLL(struct sortedLinkedList *LL)
 {
     return (LL->head == NULL);
 }
+void mergeTwoNodes(struct sortedLinkedListNode * node1, struct sortedLinkedListNode * node2)
+{
+     // If either node is NULL, return
+    if (node1 == NULL || node2 == NULL) {
+        return;
+    }
+     if(node1->data->endLocation==node2->data->startLocation -1)
+     {
+    node1->data->size=node1->data->size+node2->data->size;
+    node1->data->endLocation=node2->data->endLocation;
+    node1->next=node2->next;
 
+}
+}
+void mergeHoles(struct sortedLinkedList * LL)
+{
+    
+   struct sortedLinkedListNode *  firstNodePtr=LL->head;
+   struct sortedLinkedListNode * secNodePtr=firstNodePtr->next;
+    while(secNodePtr!=NULL)
+    {
+        mergeTwoNodes(firstNodePtr,secNodePtr);
+        firstNodePtr=firstNodePtr->next;
+        secNodePtr=secNodePtr->next;
+    }
+}
 void deAllocateProcessMemory(struct ProcessStruct *process )
 {
-  struct memoryNode* rmNode;
+  struct memoryNode* memoryRemovedNode;
   struct sortedLinkedListNode* llNode= find(memoryUsed->head,process->pid);
 if(!isEmptyLL(memoryUsed)){  
-  rmNode=removeLinkedListNode(llNode,memoryUsed);}
-if(rmNode==NULL)
+  memoryRemovedNode=removeLinkedListNode(llNode,memoryUsed);}
+if(memoryRemovedNode==NULL)
 {
-    printf("null");
-
-    rmNode->pid=-1;
- // memoryHoles->head->data->size=memoryHoles->head->data->size -rmNode->data->size;
-  //memoryHoles->head->data->startLocation=memoryHoles->head->data->startLocation+rmNode->data->size;
-  insert(memoryHoles,rmNode,rmNode->startLocation);
+    printf("null\n");
+    return ;
 }
+    memoryRemovedNode->pid=-1;
+ 
+   insert(memoryHoles,memoryRemovedNode,memoryRemovedNode->startLocation);
+ mergeHoles(memoryHoles);  
+
 }
 
 int main()
@@ -222,7 +248,7 @@ struct ProcessStruct* process = (struct ProcessStruct*) malloc(sizeof(struct Pro
     }
     struct ProcessStruct* process2 = (struct ProcessStruct*) malloc(sizeof(struct ProcessStruct));
     process2->pid = 2;
-    process2->memSize = 49;
+    process2->memSize = 30;
     process2->priority = 2;
 
     // Call the reAllocateProcessMemory function again
@@ -238,7 +264,8 @@ while(testNode !=NULL)
 {
     printf("memoryHoles \n");
      printf("%d\n",testNode->data->size);
-  //  printf("%d\n",testNode->data->startLocation);
+    printf("start location: %d\n",testNode->data->startLocation);
+    printf("end location: %d\n",testNode->data->endLocation);
 
      testNode=testNode->next;
 }
@@ -249,7 +276,10 @@ while(testNode1 !=NULL)
 {
 
      printf("%d\n",testNode1->data->size);
-//    printf("%d\n",testNode1->data->startLocation);
+
+   printf("startLoc: %d\n",testNode1->data->startLocation);
+printf("end location: %d\n",testNode1->data->endLocation);
+
      testNode1=testNode1->next;
 
 
@@ -259,16 +289,19 @@ testNode=memoryHoles->head;
 testNode1=memoryUsed->head;
 printf("deallcotion ");
 fflush(stdout);
-deAllocateProcessMemory(process);
 deAllocateProcessMemory(process2);
 printf("deallcotion ");
 fflush(stdout);
 printf("memoryHoles \n");
 
+testNode=memoryHoles->head;
+testNode1=memoryUsed->head;
+
 while(testNode !=NULL)
 {
      printf("%d\n",testNode->data->size);
-   // printf("%d\n",testNode->data->startLocation);
+    printf("start location: %d\n",testNode->data->startLocation);
+printf("end location: %d\n",testNode->data->endLocation);
 
      testNode=testNode->next;
 }
@@ -280,8 +313,36 @@ while(testNode1 !=NULL)
     printf("hamada");
     fflush(stdout);
      printf("%d\n",testNode1->data->size);
-//    printf("%d\n",testNode1->data->startLocation);
+     printf("start location:%d\n",testNode1->data->startLocation);
+     testNode1=testNode1->next;
+}
+deAllocateProcessMemory(process);
+printf("deallcotion ");
+fflush(stdout);
+printf("memoryHoles \n");
+
+testNode=memoryHoles->head;
+testNode1=memoryUsed->head;
+
+while(testNode !=NULL)
+{
+     printf("%d\n",testNode->data->size);
+    printf("start location: %d\n",testNode->data->startLocation);
+printf("end location: %d\n",testNode->data->endLocation);
+
+     testNode=testNode->next;
+}
+       printf("memoryUsed \n");
+
+testNode1=memoryUsed->head;
+while(testNode1 !=NULL)
+{
+    printf("hamada");
+    fflush(stdout);
+     printf("%d\n",testNode1->data->size);
+     printf("start location:%d\n",testNode1->data->startLocation);
      testNode1=testNode1->next;
 }
     return 0;
+
 }
