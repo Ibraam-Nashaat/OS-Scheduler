@@ -1,12 +1,11 @@
 #include "defines.h"
-#include "structs.h"
 int algorithmFlag = 1;
 int algorithmBlockingFlag = 1; // for handling processes that arrive at the same time
 int selectedAlgorithm, quantum, memoryPolicy;
 bool isRunning;
 struct msgBuff message;
-struct PQueue *priorityQueue;
-struct Queue *queue, *processWaitingQueue;
+struct PQueue *processRunningPriorityQueue;
+struct Queue *processRunningQueue, *processWaitingQueue;
 struct ProcessStruct *runningProcess = NULL;
 struct sortedLinkedList *memoryHoles, *memoryUsed;
 
@@ -69,18 +68,21 @@ void deAllocateProcessMemory(struct ProcessStruct *process)
     mergeHoles(memoryHoles);
 }
 
-void reAllocateProcessMemory(struct ProcessStruct *Process)
+bool allocateProcessInMemory(struct ProcessStruct *Process)
 {
     struct memoryNode *memNode = createMemoryNode(memoryHoles->head->data->startLocation, Process->memSize, Process->pid);
     struct sortedLinkedListNode *currNode = memoryHoles->head;
-    while (memNode->size > currNode->data->size && currNode != NULL)
+
+    printf("ni ni ni ni ni\n");
+    fflush(stdout);
+    while (currNode != NULL && memNode->size > currNode->data->size)
     {
         currNode = currNode->next;
     }
     if (currNode == NULL)
     {
         printf("NO memory available\n");
-        return;
+        return false;
     }
     if (memNode->size == currNode->data->size)
     {
@@ -94,18 +96,36 @@ void reAllocateProcessMemory(struct ProcessStruct *Process)
 
         insert(memoryUsed, memNode, Process->priority);
     }
+    return true;
 }
 // This function terminates the process and frees the memory
 // sigNum: the signal number for termination
 void terminateProcess(int sigNum)
 {
+    deAllocateProcessMemory(runningProcess);
     printf("process %d finished At=%d\n", runningProcess->id, getClk());
     free(runningProcess);
     runningProcess = NULL;
     isRunning = false;
     fflush(stdout);
-    deAllocateProcessMemory(runningProcess);
-    reAllocateProcessMemory(runningProcess);
+    struct ProcessStruct *waitingProcess = peekQueue(processWaitingQueue);
+    printf("are you here\n");
+    fflush(stdout);
+    if (waitingProcess!=NULL && allocateProcessInMemory(waitingProcess))
+    {
+        waitingProcess = dequeue(processWaitingQueue);
+        if (selectedAlgorithm == 1)
+            push(processRunningPriorityQueue, waitingProcess, waitingProcess->priority);
+        else if (selectedAlgorithm == 2)
+            push(processRunningPriorityQueue, waitingProcess, waitingProcess->remainingTime);
+        else if (selectedAlgorithm == 3)
+            enqueue(processRunningQueue, waitingProcess);
+        
+    printf("alo alo hwl\n");
+    fflush(stdout);
+    }
+    printf("teeeeeeeeeeerminate\n");
+    fflush(stdout);
 }
 
 // This function blocks the process, puts it at the end of the queue or the priority queue depending on the algorithm, and makes isRunning=false to begin another process.
@@ -116,7 +136,7 @@ void blockProcess()
         // For round robin algorithm, enqueue the process at the end of the queue
         // queue: a pointer to the queue structure
         // runningProcess: a pointer to the process structure
-        enqueue(queue, runningProcess);
+        enqueue(processRunningQueue, runningProcess);
     }
     else
     {
@@ -126,7 +146,7 @@ void blockProcess()
         runningProcess->lastStopedTime = getClk();
         kill(runningProcess->pid, INTERRUPT_SIGNAL);
         kill(runningProcess->pid, SIGSTOP);
-        push(priorityQueue, runningProcess, runningProcess->remainingTime);
+        push(processRunningPriorityQueue, runningProcess, runningProcess->remainingTime);
     }
     printf("id = %d Blocked pid = %d remainingtime = %d current time = %d \n", runningProcess->id, runningProcess->pid, runningProcess->remainingTime, getClk());
     isRunning = false;

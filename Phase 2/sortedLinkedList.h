@@ -12,7 +12,6 @@ struct sortedLinkedListNode *newSortedLLNode(struct memoryNode *memoryNode, int 
 struct sortedLinkedList *createSortedLinkedList()
 {
     struct sortedLinkedList *LL = (struct sortedLinkedList *)malloc(sizeof(struct sortedLinkedList));
-    // Intialize queue
     LL->head = NULL;
     LL->tail = NULL;
     return LL;
@@ -27,7 +26,6 @@ void insert(struct sortedLinkedList *LL, struct memoryNode *memoryNode, int prio
 {
     struct sortedLinkedListNode *LLnodeHead = LL->head;
     struct sortedLinkedListNode *nNode = newSortedLLNode(memoryNode, priority);
-    // codition if queue is empty
     if (LL->head == NULL)
     {
         LL->tail = LL->head = nNode;
@@ -105,6 +103,7 @@ struct sortedLinkedListNode *find(struct sortedLinkedListNode *headList, int pid
 struct sortedLinkedListNode *splitNode(struct sortedLinkedListNode *nodeToSplit, int memSize)
 {
     // Create a new node with part the data of the original node
+    if(nodeToSplit==NULL) return NULL;
     struct sortedLinkedListNode *newNode = (struct sortedLinkedListNode *)malloc(sizeof(struct sortedLinkedListNode));
     // alocate memoryNode -->data of LLNode
     newNode->data = (struct memoryNode *)malloc(sizeof(struct memoryNode));
