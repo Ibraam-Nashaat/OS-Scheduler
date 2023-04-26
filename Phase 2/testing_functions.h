@@ -23,7 +23,7 @@ void testLinkedList(struct Queue *queue)
     while (!isEmptyQueue(queue))
     {
         struct ProcessStruct *process = dequeue(queue);
-        struct memoryNode *mem = createMemoryNode(0, process->memSize, process->pid);
+        struct memoryNode *mem = createMemoryNode(0, process->memSize, process->id);
         insert(listNode, mem, process->priority);
         enqueue(tempQueue, process);
         // if(i==1) nodeToDelete=listNode->tail;
@@ -69,8 +69,8 @@ void printMemory(struct sortedLinkedList* list,char memoryType[]){
     printf("%s\n",memoryType);
     while (listNode != NULL)
     {
-        printf("size: %d ,start location: %d, end location: %d \n", 
-                listNode->data->size,listNode->data->startLocation, listNode->data->endLocation);
+        printf("size: %d ,start location: %d, end location: %d, pid: %d \n\n", 
+                listNode->data->size,listNode->data->startLocation, listNode->data->endLocation,listNode->data->pid);
         listNode = listNode->next;
     }
 }

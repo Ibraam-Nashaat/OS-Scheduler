@@ -52,10 +52,12 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
 void deAllocateProcessMemory(struct ProcessStruct *process)
 {
     struct memoryNode *memoryRemovedNode;
-    struct sortedLinkedListNode *llNode = find(memoryUsed->head, process->pid);
+    struct sortedLinkedListNode *llNode = find(memoryUsed->head, process->id);
+    printf("isEmpty %d\n",isEmptyLL(memoryUsed));
     if (!isEmptyLL(memoryUsed))
     {
         memoryRemovedNode = removeLinkedListNode(llNode, memoryUsed);
+        printf("memory removed\n");
     }
     if (memoryRemovedNode == NULL)
     {
@@ -72,7 +74,7 @@ void deAllocateProcessMemory(struct ProcessStruct *process)
 
 bool allocateProcessInMemory(struct ProcessStruct *Process)
 {
-    struct memoryNode *memNode = createMemoryNode(memoryHoles->head->data->startLocation, Process->memSize, Process->pid);
+    struct memoryNode *memNode = createMemoryNode(memoryHoles->head->data->startLocation, Process->memSize, Process->id);
     struct sortedLinkedListNode *currNode = memoryHoles->head;
 
     fflush(stdout);
