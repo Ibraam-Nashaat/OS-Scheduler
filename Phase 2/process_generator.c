@@ -1,5 +1,5 @@
 #include "headers.h"
-#include "process_generator_tester.h"
+#include "testing_functions.h"
 int schedulerPID;
 
 void clearResources(int signum)

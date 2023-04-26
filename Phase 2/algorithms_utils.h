@@ -66,6 +66,8 @@ void deAllocateProcessMemory(struct ProcessStruct *process)
 
     insert(memoryHoles, memoryRemovedNode, memoryRemovedNode->startLocation);
     mergeHoles(memoryHoles);
+    printMemory(memoryHoles,"Memory Holes after Deallocation");
+    printMemory(memoryUsed,"Memory Used after Deallocation");
 }
 
 bool allocateProcessInMemory(struct ProcessStruct *Process)
@@ -73,7 +75,6 @@ bool allocateProcessInMemory(struct ProcessStruct *Process)
     struct memoryNode *memNode = createMemoryNode(memoryHoles->head->data->startLocation, Process->memSize, Process->pid);
     struct sortedLinkedListNode *currNode = memoryHoles->head;
 
-    printf("ni ni ni ni ni\n");
     fflush(stdout);
     while (currNode != NULL && memNode->size > currNode->data->size)
     {
@@ -82,6 +83,8 @@ bool allocateProcessInMemory(struct ProcessStruct *Process)
     if (currNode == NULL)
     {
         printf("NO memory available\n");
+        printMemory(memoryHoles,"Memory Holes after allocation");
+        printMemory(memoryUsed,"Memory Used after allocation");
         return false;
     }
     if (memNode->size == currNode->data->size)
@@ -96,6 +99,9 @@ bool allocateProcessInMemory(struct ProcessStruct *Process)
 
         insert(memoryUsed, memNode, Process->priority);
     }
+
+    printMemory(memoryHoles,"Memory Holes after allocation");
+    printMemory(memoryUsed,"Memory Used after allocation");
     return true;
 }
 // This function terminates the process and frees the memory
@@ -109,8 +115,6 @@ void terminateProcess(int sigNum)
     isRunning = false;
     fflush(stdout);
     struct ProcessStruct *waitingProcess = peekQueue(processWaitingQueue);
-    printf("are you here\n");
-    fflush(stdout);
     if (waitingProcess!=NULL && allocateProcessInMemory(waitingProcess))
     {
         waitingProcess = dequeue(processWaitingQueue);
@@ -121,11 +125,7 @@ void terminateProcess(int sigNum)
         else if (selectedAlgorithm == 3)
             enqueue(processRunningQueue, waitingProcess);
         
-    printf("alo alo hwl\n");
-    fflush(stdout);
     }
-    printf("teeeeeeeeeeerminate\n");
-    fflush(stdout);
 }
 
 // This function blocks the process, puts it at the end of the queue or the priority queue depending on the algorithm, and makes isRunning=false to begin another process.

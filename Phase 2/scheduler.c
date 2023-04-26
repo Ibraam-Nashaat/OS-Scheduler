@@ -1,4 +1,5 @@
 #include "headers.h"
+#include "testing_functions.h"
 #include "scheduling_algorithms.h"
 
 void pushProcessToWaitingQueue(struct ProcessStruct process)
