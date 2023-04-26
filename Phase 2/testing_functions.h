@@ -36,7 +36,7 @@ void testLinkedList(struct Queue *queue)
     {
         printf("start %d, end %d, size %d, pid %d\n",
                ptr->data->startLocation, ptr->data->endLocation,
-               ptr->data->size, ptr->data->pid);
+               ptr->data->size, ptr->data->id);
         ptr = ptr->next;
     }
     removeLinkedListNode(listNode->head, listNode);
@@ -48,7 +48,7 @@ void testLinkedList(struct Queue *queue)
     {
         printf("start %d, end %d, size %d, pid %d\n",
                ptr->data->startLocation, ptr->data->endLocation,
-               ptr->data->size, ptr->data->pid);
+               ptr->data->size, ptr->data->id);
         ptr = ptr->next;
     }
     removeLinkedListNode(listNode->tail, listNode);
@@ -59,7 +59,7 @@ void testLinkedList(struct Queue *queue)
     {
         printf("start %d, end %d, size %d, pid %d\n",
                ptr->data->startLocation, ptr->data->endLocation,
-               ptr->data->size, ptr->data->pid);
+               ptr->data->size, ptr->data->id);
         ptr = ptr->next;
     }
 }
@@ -69,8 +69,8 @@ void printMemory(struct sortedLinkedList* list,char memoryType[]){
     printf("%s\n",memoryType);
     while (listNode != NULL)
     {
-        printf("size: %d ,start location: %d, end location: %d, pid: %d \n\n", 
-                listNode->data->size,listNode->data->startLocation, listNode->data->endLocation,listNode->data->pid);
+        printf("size: %d ,start location: %d, end location: %d, id: %d \n\n", 
+                listNode->data->size,listNode->data->startLocation, listNode->data->endLocation,listNode->data->id);
         listNode = listNode->next;
     }
 }

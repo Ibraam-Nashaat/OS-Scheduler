@@ -16,7 +16,7 @@ struct memoryNode{
     int startLocation,
         endLocation,
         size,
-        pid;
+        id;
 };
 
 

@@ -89,10 +89,10 @@ struct memoryNode *removeLinkedListNode(struct sortedLinkedListNode *node, struc
     return mem;
 }
 // find node by its pid
-struct sortedLinkedListNode *find(struct sortedLinkedListNode *headList, int pid)
+struct sortedLinkedListNode *find(struct sortedLinkedListNode *headList, int id)
 {
     struct sortedLinkedListNode *curr = headList;
-    while (curr != NULL && curr->data->pid != pid)
+    while (curr != NULL && curr->data->id != id)
     {
         curr = curr->next;
     }
@@ -108,7 +108,7 @@ struct sortedLinkedListNode *splitNode(struct sortedLinkedListNode *nodeToSplit,
     // alocate memoryNode -->data of LLNode
     newNode->data = (struct memoryNode *)malloc(sizeof(struct memoryNode));
     newNode->data->startLocation = nodeToSplit->data->startLocation;
-    newNode->data->pid = nodeToSplit->data->pid;
+    newNode->data->id = nodeToSplit->data->id;
     newNode->priority = nodeToSplit->priority;
     newNode->data->size = memSize;
     newNode->data->endLocation = newNode->data->startLocation + memSize;

@@ -64,7 +64,7 @@ void deAllocateProcessMemory(struct ProcessStruct *process)
         printf("null\n");
         return;
     }
-    memoryRemovedNode->pid = -1;
+    memoryRemovedNode->id = -1;
 
     insert(memoryHoles, memoryRemovedNode, memoryRemovedNode->startLocation);
     mergeHoles(memoryHoles);

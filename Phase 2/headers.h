@@ -177,10 +177,10 @@ struct ProcessStruct *create_process(int id, int arrivalTime, int priority, int 
     return process;
 }
 
-struct memoryNode* createMemoryNode(int startLocation,int size,int pid){
+struct memoryNode* createMemoryNode(int startLocation,int size,int id){
     struct memoryNode *memoryNode=(struct memoryNode *)malloc(sizeof(struct memoryNode));
     memoryNode->startLocation=startLocation;
     memoryNode->endLocation=startLocation+size-1;
     memoryNode->size=size;
-    memoryNode->pid=pid;
+    memoryNode->id=id;
 };
