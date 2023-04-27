@@ -3,6 +3,8 @@
 int algorithmFlag = 1;
 int algorithmBlockingFlag = 1; // for handling processes that arrive at the same time
 int selectedAlgorithm, quantum;
+int totalRunningTime = 0, totalWaitingTime = 0;
+float sumWeightedTAT = 0, sumWeightedTATSquared = 0;
 bool isRunning;
 struct msgBuff message;
 struct PQueue *priorityQueue;
@@ -20,6 +22,7 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
     if (runningProcess->pid != -1) // if the process started before, send CONTINUE_PROCESS signal to make it continue its execution
     {
         printf("Process with id %d and pid %d continued, clk %d\n", runningProcess->id, runningProcess->pid, getClk());
+        runningProcess->waitingTime += (getClk() - runningProcess->lastStopedTime);
         kill(runningProcess->pid, CONTINUE_PROCESS);
         return;
     }
@@ -33,11 +36,13 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
     {
         printf("process %d started at time %d \n", runningProcess->id, getClk());
         fflush(stdout);
-        char remainigTimeChar[13];
-        sprintf(remainigTimeChar, "%d", currProcess->remainingTime);
+        totalRunningTime += runningProcess->runningTime;
+
+        char remainingTimeChar[13];
+        sprintf(remainingTimeChar, "%d", currProcess->remainingTime);
         char quantumChar[13];
         sprintf(quantumChar, "%d", quantum);
-        char *argv[] = {"./process.out", remainigTimeChar, quantumChar, NULL}; // send remaining time and quantum as arguments
+        char *argv[] = {"./process.out", remainingTimeChar, quantumChar, NULL}; // send remaining time and quantum as arguments
         int execlResult = execvp(argv[0], argv);
         if (execlResult == -1)
         {
@@ -55,6 +60,16 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
 void terminateProcess(int sigNum)
 {
     printf("process %d finished At=%d\n", runningProcess->id, getClk());
+    totalWaitingTime += runningProcess->waitingTime;
+    int turnaroundTime = getClk() - runningProcess->arrivalTime;
+    float weightedTAT = 0;
+    if(runningProcess->runningTime){
+        weightedTAT = turnaroundTime / (float) runningProcess->runningTime;
+    }
+
+    sumWeightedTAT += weightedTAT;
+    sumWeightedTATSquared += (weightedTAT * weightedTAT);
+
     free(runningProcess);
     runningProcess = NULL;
     isRunning = false;
