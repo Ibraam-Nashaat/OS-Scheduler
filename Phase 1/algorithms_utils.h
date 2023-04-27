@@ -22,7 +22,7 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
     // runningProcess->lastStartedTime = getClk();
     if (runningProcess->pid != -1) // if the process started before, send CONTINUE_PROCESS signal to make it continue its execution
     {
-        printf("\033[1;33mProcess with id %d and pid %d continued at time = %d\033[0m\n", runningProcess->id, runningProcess->pid, getClk(), runningProcess->lastStopedTime);
+        printf("\033[1;33mProcess with id %d and pid %d continued at time = %d\033[0m\n", runningProcess->id, runningProcess->pid, getClk());
         fprintf(logFile, "At time %d process %d resumed arr %d total %d remain %d wait %d\n", getClk(), runningProcess->id, runningProcess->arrivalTime, runningProcess->runningTime, runningProcess->remainingTime, runningProcess->waitingTime);
         runningProcess->waitingTime += (getClk() - runningProcess->lastStopedTime);
         kill(runningProcess->pid, CONTINUE_PROCESS);
@@ -64,7 +64,7 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
 void terminateProcess(int sigNum)
 {
     totalWaitingTime += runningProcess->waitingTime;
-    printf("\033[1;32mProcess %d finished at time = %d\033[0m\n", runningProcess->id, getClk(), runningProcess->waitingTime);
+    printf("\033[1;32mProcess %d finished at time = %d\033[0m\n", runningProcess->id, getClk());
     int turnaroundTime = getClk() - runningProcess->arrivalTime;
     float weightedTAT = 0;
     if (runningProcess->runningTime)
