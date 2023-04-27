@@ -18,7 +18,8 @@ typedef short bool;
 #include "structs.h"
 #include "PQueue.h"
 #include "Queue.h"
-#include "process_generator_tester.h"
+#include "sortedLinkedList.h"
+
 
 int messageQueueID;
 int processGeneratorAndSchedulerSemID; // The ID of the semaphore between process generator and scheduler
@@ -176,3 +177,11 @@ struct ProcessStruct *create_process(int id, int arrivalTime, int priority, int 
     process->memSize=memSize;
     return process;
 }
+
+struct memoryNode* createMemoryNode(int startLocation,int size,int id){
+    struct memoryNode *memoryNode=(struct memoryNode *)malloc(sizeof(struct memoryNode));
+    memoryNode->startLocation=startLocation;
+    memoryNode->endLocation=startLocation+size-1;
+    memoryNode->size=size;
+    memoryNode->id=id;
+};

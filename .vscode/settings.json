@@ -4,5 +4,6 @@
     "srtn.h": "c",
     "process_generator_tester.h": "c",
     "sem.h": "c"
-  }
+  },
+  "C_Cpp.errorSquiggles": "enabled"
 }

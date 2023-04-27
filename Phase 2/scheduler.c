@@ -1,13 +1,26 @@
 #include "headers.h"
+#include "testing_functions.h"
+#include "firstFit.h"
 #include "scheduling_algorithms.h"
+
+
+void pushProcessToWaitingQueue(struct ProcessStruct process)
+{
+    if (process.id != -1)
+    {
+        struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
+                                                          process.runningTime, process.memSize);
+        enqueue(waitingProcessesQueue, newProcess);
+    }
+}
 
 void pushProcessToSRTN(struct ProcessStruct process)
 {
     if (process.id != -1)
     {
         struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
-                                                          process.runningTime,process.memSize);
-        push(priorityQueue, newProcess, newProcess->remainingTime);
+                                                          process.runningTime, process.memSize);
+        push(readyProcessesPriorityQueue, newProcess, newProcess->remainingTime);
     }
 }
 
@@ -16,8 +29,8 @@ void pushProcessToHPF(struct ProcessStruct process)
     if (process.id != -1)
     {
         struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
-                                                          process.runningTime,process.memSize);
-        push(priorityQueue, newProcess, newProcess->priority);
+                                                          process.runningTime, process.memSize);
+        push(readyProcessesPriorityQueue, newProcess, newProcess->priority);
     }
 }
 
@@ -26,11 +39,19 @@ void pushProcessToRR(struct ProcessStruct process)
     if (process.id != -1)
     {
         struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
-                                                          process.runningTime,process.memSize);
-        enqueue(queue, newProcess);
+                                                          process.runningTime, process.memSize);
+        enqueue(readyProcessesQueue, newProcess);
     }
 }
-
+bool tryAllocatingMemory(struct ProcessStruct process)
+{
+    if (memoryPolicy == 1) // FirstFit
+        return allocateProcessMemoryFirstFit(&process);
+    else
+    {
+        return 1; // change after implementing buddy memory allocation
+    }
+}
 void getProcess(int signum)
 {
     int rec_val = msgrcv(messageQueueID, &message, sizeof(message.process), 5, !IPC_NOWAIT);
@@ -46,22 +67,33 @@ void getProcess(int signum)
     switch (selectedAlgorithm)
     {
     case 1:
-        pushProcessToHPF(message.process);
+        if (tryAllocatingMemory(message.process))
+            pushProcessToHPF(message.process);
+        else
+            pushProcessToWaitingQueue(message.process);
         break;
     case 2:
-        pushProcessToSRTN(message.process);
-        if (isRunning)
+        if (tryAllocatingMemory(message.process))
         {
-            int tempRunningRime = runningProcess->remainingTime;
-            runningProcess->remainingTime = runningProcess->remainingTime - (getClk() - runningProcess->lastStopedTime);
-            if (message.process.runningTime < runningProcess->remainingTime)
-                blockProcess();
-            else
-                runningProcess->remainingTime = tempRunningRime;
+            pushProcessToSRTN(message.process);
+            if (isRunning)
+            {
+                int tempRunningRime = runningProcess->remainingTime;
+                runningProcess->remainingTime = runningProcess->remainingTime - (getClk() - runningProcess->lastStopedTime);
+                if (message.process.runningTime < runningProcess->remainingTime)
+                    blockProcess();
+                else
+                    runningProcess->remainingTime = tempRunningRime;
+            }
         }
+        else
+            pushProcessToWaitingQueue(message.process);
         break;
     case 3:
-        pushProcessToRR(message.process);
+        if (tryAllocatingMemory(message.process))
+            pushProcessToRR(message.process);
+        else
+            pushProcessToWaitingQueue(message.process);
         break;
     }
 
@@ -102,24 +134,34 @@ int main(int argc, char *argv[])
 
     // Get the selected algorithm from the command line argument
     selectedAlgorithm = atoi(argv[1]);
+    memoryPolicy = atoi(argv[3]);
     printf("Selected Algorithm: %d\n", selectedAlgorithm);
     fflush(stdout);
+    if (memoryPolicy == 1)
+    {
+        memoryHoles = createSortedLinkedList();
+        memoryUsed = createSortedLinkedList();
+        struct memoryNode *memoryNode = createMemoryNode(0, 1024, -1);
+        insert(memoryHoles, memoryNode, 0);
+    }
+
+    waitingProcessesQueue = createQueue(); // Queue containing processes that can't be allocated
 
     // Switch on the selected algorithm and allocate the appropriate data structure
     switch (selectedAlgorithm)
     {
     case HPF_ALGORITHM:
-        priorityQueue = createPriorityQueue();
-        HPF(priorityQueue);
+        readyProcessesPriorityQueue = createPriorityQueue();
+        HPF(readyProcessesPriorityQueue);
         break;
     case SRTN_ALGORITHM:
-        priorityQueue = createPriorityQueue();
-        SRTN(priorityQueue);
+        readyProcessesPriorityQueue = createPriorityQueue();
+        SRTN(readyProcessesPriorityQueue);
         break;
     case RR_ALGORITHM:
-        queue = createQueue();
+        readyProcessesQueue = createQueue();
         quantum = atoi(argv[2]);
-        RR(queue, quantum);
+        RR(readyProcessesQueue, quantum);
         break;
     default:
         printf("Invalid algorithm selected.\n");
