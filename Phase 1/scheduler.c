@@ -97,20 +97,16 @@ void generatePerfFile()
     FILE *perfFile;
     perfFile = fopen("scheduler.perf", "w");
 
-    fprintf(perfFile, "%s", "CPU Utilization = ");
-    fprintf(perfFile, "%d%%\n", (totalRunningTime * 100 / getClk()));
+    fprintf(perfFile, "CPU Utilization = %d%%\n", (totalRunningTime * 100 / getClk()));
 
-    fprintf(perfFile, "%s", "Avg WTA = ");
-    fprintf(perfFile, "%.2f\n", (sumWeightedTAT / (float)numberOfProcesses));
+    fprintf(perfFile, "Avg WTA = %.2f\n", (sumWeightedTAT / (float)numberOfProcesses));
 
-    fprintf(perfFile, "%s", "Avg Waiting = ");
-    fprintf(perfFile, "%.2f\n", (totalWaitingTime / (float)numberOfProcesses));
+    fprintf(perfFile, "Avg Waiting = %.2f\n", (totalWaitingTime / (float)numberOfProcesses));
 
     float meanWTA = sumWeightedTAT / (float)numberOfProcesses;
     float stdDev = sqrt(abs(((sumWeightedTAT) - (numberOfProcesses * pow(meanWTA, 2)))) / (float)numberOfProcesses);
 
-    fprintf(perfFile, "%s", "Std WTA = ");
-    fprintf(perfFile, "%.2f\n", stdDev);
+    fprintf(perfFile,"Std WTA = %.2f\n", stdDev);
 
     fclose(perfFile);
 }
@@ -135,6 +131,7 @@ int main(int argc, char *argv[])
     selectedAlgorithm = atoi(argv[1]);
 
     logFile = fopen("scheduler.log", "w");
+    fprintf(logFile, "#At time x process y state arr w total z remain y wait k\n");
 
     // Switch on the selected algorithm and allocate the appropriate data structure
     switch (selectedAlgorithm)
