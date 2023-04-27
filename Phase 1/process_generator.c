@@ -21,7 +21,6 @@ void readFile(struct Queue *processQueue)
         perror("Unable to read the first line from file");
     }
 
-
     while (fscanf(file, "%d\t%d\t%d\t%d", &id, &arrivalTime, &runningTime, &priority) != EOF)
     {
         totalRunningTime += runningTime;
@@ -73,7 +72,7 @@ int main(int argc, char *argv[])
     // 1. Read the input files.
     struct Queue *processQueue = createQueue();
     readFile(processQueue);
-    
+
     // 2. Ask the user for the chosen scheduling algorithm and its parameters, if there are any.
     int algo;
     int quantum = getSchedulingAlgoFromUser(&algo);
@@ -95,7 +94,7 @@ int main(int argc, char *argv[])
         sprintf(algoAsChar, "%d", algo);
         sprintf(quantumAsChar, "%d", quantum);
         sprintf(totalRunningTimeAsChar, "%d", totalRunningTime);
-        char *args[] = {"./scheduler.out", algoAsChar, quantumAsChar, totalRunningTimeAsChar ,NULL};
+        char *args[] = {"./scheduler.out", algoAsChar, quantumAsChar, totalRunningTimeAsChar, NULL};
         execvp(args[0], args);
     }
     // 4. Use this function after creating the clock process to initialize clock

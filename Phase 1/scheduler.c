@@ -92,7 +92,8 @@ void changeBlockingFlag(int signum)
     algorithmBlockingFlag = !algorithmBlockingFlag;
 }
 
-void generatePerfFile() {
+void generatePerfFile()
+{
     FILE *perfFile;
     perfFile = fopen("scheduler.perf", "w");
 
@@ -100,13 +101,13 @@ void generatePerfFile() {
     fprintf(perfFile, "%d%%\n", (totalRunningTime * 100 / getClk()));
 
     fprintf(perfFile, "%s", "Avg WTA = ");
-    fprintf(perfFile, "%.2f\n", (sumWeightedTAT / (float) numberOfProcesses));
+    fprintf(perfFile, "%.2f\n", (sumWeightedTAT / (float)numberOfProcesses));
 
     fprintf(perfFile, "%s", "Avg Waiting = ");
-    fprintf(perfFile, "%.2f\n", (totalWaitingTime / (float) numberOfProcesses));
+    fprintf(perfFile, "%.2f\n", (totalWaitingTime / (float)numberOfProcesses));
 
-    float meanWTA = sumWeightedTAT / (float) numberOfProcesses;
-    float stdDev = sqrt(abs(((sumWeightedTAT) - (numberOfProcesses * pow(meanWTA, 2)))) / (float) numberOfProcesses);
+    float meanWTA = sumWeightedTAT / (float)numberOfProcesses;
+    float stdDev = sqrt(abs(((sumWeightedTAT) - (numberOfProcesses * pow(meanWTA, 2)))) / (float)numberOfProcesses);
 
     fprintf(perfFile, "%s", "Std WTA = ");
     fprintf(perfFile, "%.2f\n", stdDev);
@@ -156,7 +157,7 @@ int main(int argc, char *argv[])
         break;
     }
     fclose(logFile);
-    
+
     generatePerfFile();
 
     // Destroy the clock and exit

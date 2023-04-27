@@ -50,7 +50,7 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
             exit(-1);
         }
     }
-    
+
     fprintf(logFile, "At time %d process %d started arr %d total %d remain %d wait %d\n", getClk(), runningProcess->id, runningProcess->arrivalTime, runningProcess->runningTime, runningProcess->remainingTime, runningProcess->waitingTime);
 
     runningProcess->pid = pid;
@@ -67,8 +67,9 @@ void terminateProcess(int sigNum)
     printf("\033[1;32mProcess %d finished at time = %d\033[0m\n", runningProcess->id, getClk(), runningProcess->waitingTime);
     int turnaroundTime = getClk() - runningProcess->arrivalTime;
     float weightedTAT = 0;
-    if(runningProcess->runningTime){
-        weightedTAT = turnaroundTime / (float) runningProcess->runningTime;
+    if (runningProcess->runningTime)
+    {
+        weightedTAT = turnaroundTime / (float)runningProcess->runningTime;
     }
 
     sumWeightedTAT += weightedTAT;
