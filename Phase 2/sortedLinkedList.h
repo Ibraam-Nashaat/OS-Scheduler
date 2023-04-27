@@ -103,7 +103,8 @@ struct sortedLinkedListNode *find(struct sortedLinkedListNode *headList, int id)
 struct sortedLinkedListNode *splitNode(struct sortedLinkedListNode *nodeToSplit, int memSize)
 {
     // Create a new node with part the data of the original node
-    if(nodeToSplit==NULL) return NULL;
+    if (nodeToSplit == NULL)
+        return NULL;
     struct sortedLinkedListNode *newNode = (struct sortedLinkedListNode *)malloc(sizeof(struct sortedLinkedListNode));
     // alocate memoryNode -->data of LLNode
     newNode->data = (struct memoryNode *)malloc(sizeof(struct memoryNode));
@@ -121,19 +122,23 @@ struct sortedLinkedListNode *splitNode(struct sortedLinkedListNode *nodeToSplit,
     // Return a pointer to the new node created by the split
     return newNode;
 }
-void mergeTwoNodes(struct sortedLinkedListNode *node1, struct sortedLinkedListNode *node2)
+bool mergeTwoNodes(struct sortedLinkedListNode *node1, struct sortedLinkedListNode *node2)
 {
     // If either node is NULL, return
     if (node1 == NULL || node2 == NULL)
     {
-        return;
+        return false;
     }
     if (node1->data->endLocation == node2->data->startLocation - 1)
     {
         node1->data->size = node1->data->size + node2->data->size;
         node1->data->endLocation = node2->data->endLocation;
         node1->next = node2->next;
+        free(node2->data);
+        free(node2);
+        return true;
     }
+    return false;
 }
 void mergeHoles(struct sortedLinkedList *LL)
 {
@@ -141,8 +146,11 @@ void mergeHoles(struct sortedLinkedList *LL)
     struct sortedLinkedListNode *secNodePtr = firstNodePtr->next;
     while (secNodePtr != NULL)
     {
-        mergeTwoNodes(firstNodePtr, secNodePtr);
-        firstNodePtr = firstNodePtr->next;
-        secNodePtr = secNodePtr->next;
+        if (!mergeTwoNodes(firstNodePtr, secNodePtr))
+        {
+            firstNodePtr = firstNodePtr->next;
+            secNodePtr = secNodePtr->next;
+        }
+        else secNodePtr=firstNodePtr->next;
     }
 }
