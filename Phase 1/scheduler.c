@@ -99,16 +99,16 @@ void generatePerfFile() {
     fprintf(perfFile, "%s", "CPU Utilization = ");
     fprintf(perfFile, "%d%%\n", (totalRunningTime * 100 / getClk()));
 
-    fprintf(perfFile, "%s", "Average Weighted Turnaround Time = ");
+    fprintf(perfFile, "%s", "Avg WTA = ");
     fprintf(perfFile, "%.2f\n", (sumWeightedTAT / (float) numberOfProcesses));
 
-    fprintf(perfFile, "%s", "Average Waiting Time = ");
+    fprintf(perfFile, "%s", "Avg Waiting = ");
     fprintf(perfFile, "%.2f\n", (totalWaitingTime / (float) numberOfProcesses));
 
     float meanWTA = sumWeightedTAT / (float) numberOfProcesses;
     float stdDev = sqrt(abs(((sumWeightedTAT) - (numberOfProcesses * pow(meanWTA, 2)))) / (float) numberOfProcesses);
 
-    fprintf(perfFile, "%s", "Standard Deviation for Weighted Turnaround Time = ");
+    fprintf(perfFile, "%s", "Std WTA = ");
     fprintf(perfFile, "%.2f\n", stdDev);
 
     fclose(perfFile);
@@ -133,6 +133,8 @@ int main(int argc, char *argv[])
     // Get the selected algorithm from the command line argument
     selectedAlgorithm = atoi(argv[1]);
 
+    logFile = fopen("scheduler.log", "w");
+
     // Switch on the selected algorithm and allocate the appropriate data structure
     switch (selectedAlgorithm)
     {
@@ -153,7 +155,8 @@ int main(int argc, char *argv[])
         printf("Invalid algorithm selected.\n");
         break;
     }
-
+    fclose(logFile);
+    
     generatePerfFile();
 
     // Destroy the clock and exit

@@ -10,6 +10,7 @@ struct msgBuff message;
 struct PQueue *priorityQueue;
 struct Queue *queue;
 struct ProcessStruct *runningProcess = NULL;
+FILE *logFile;
 
 // Run a process with a given quantum time
 // currProcess: a pointer to the process structure
@@ -22,6 +23,7 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
     if (runningProcess->pid != -1) // if the process started before, send CONTINUE_PROCESS signal to make it continue its execution
     {
         printf("\033[1;33mProcess with id %d and pid %d continued at time = %d\033[0m\n", runningProcess->id, runningProcess->pid, getClk(), runningProcess->lastStopedTime);
+        fprintf(logFile, "At time %d process %d resumed arr %d total %d remain %d wait %d\n", getClk(), runningProcess->id, runningProcess->arrivalTime, runningProcess->runningTime, runningProcess->remainingTime, runningProcess->waitingTime);
         runningProcess->waitingTime += (getClk() - runningProcess->lastStopedTime);
         kill(runningProcess->pid, CONTINUE_PROCESS);
         return;
@@ -35,7 +37,6 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
     if (pid == 0) // make new process
     {
         printf("\033[1;34mProcess %d started at time %d\033[0m\n", runningProcess->id, getClk());
-        fflush(stdout);
 
         char remainingTimeChar[13];
         sprintf(remainingTimeChar, "%d", currProcess->remainingTime);
@@ -49,6 +50,9 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
             exit(-1);
         }
     }
+    
+    fprintf(logFile, "At time %d process %d started arr %d total %d remain %d wait %d\n", getClk(), runningProcess->id, runningProcess->arrivalTime, runningProcess->runningTime, runningProcess->remainingTime, runningProcess->waitingTime);
+
     runningProcess->pid = pid;
     runningProcess->startTime = getClk();
     runningProcess->waitingTime = runningProcess->startTime - runningProcess->arrivalTime;
@@ -68,6 +72,8 @@ void terminateProcess(int sigNum)
     }
 
     sumWeightedTAT += weightedTAT;
+
+    fprintf(logFile, "At time %d process %d finished arr %d total %d remain %d wait %d TA %d WTA %.2f\n", getClk(), runningProcess->id, runningProcess->arrivalTime, runningProcess->runningTime, runningProcess->remainingTime, runningProcess->waitingTime, turnaroundTime, weightedTAT);
 
     free(runningProcess);
     runningProcess = NULL;
@@ -95,7 +101,8 @@ void blockProcess()
         push(priorityQueue, runningProcess, runningProcess->remainingTime);
     }
     runningProcess->lastStopedTime = getClk();
-    printf("\033[1;33mid = %d Blocked pid = %d remainingtime = %d current time = %d\033[0m\n", runningProcess->id, runningProcess->pid, runningProcess->remainingTime, getClk());
+    printf("\033[1;33mid = %d Blocked pid = %d remaining time = %d current time = %d\033[0m\n", runningProcess->id, runningProcess->pid, runningProcess->remainingTime, getClk());
+    fprintf(logFile, "At time %d process %d stopped arr %d total %d remain %d wait %d\n", getClk(), runningProcess->id, runningProcess->arrivalTime, runningProcess->runningTime, runningProcess->remainingTime, runningProcess->waitingTime);
     isRunning = false;
     fflush(stdout);
 }
