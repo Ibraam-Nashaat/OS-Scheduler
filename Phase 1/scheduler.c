@@ -1,5 +1,9 @@
+#include "math.h"
 #include "headers.h"
 #include "scheduling_algorithms.h"
+
+int numberOfProcesses = 0;
+int totalRunningTime = 0;
 
 void pushProcessToSRTN(struct ProcessStruct process)
 {
@@ -43,6 +47,9 @@ void getProcess(int signum)
         perror("Error in receiving from msg queue\n");
     }
 
+    numberOfProcesses++;
+    totalRunningTime += message.process.runningTime;
+
     switch (selectedAlgorithm)
     {
     case 1:
@@ -79,9 +86,32 @@ void changeAlgorithmFlag(int sigNum)
 {
     algorithmFlag = 0;
 }
+
 void changeBlockingFlag(int signum)
 {
     algorithmBlockingFlag = !algorithmBlockingFlag;
+}
+
+void generatePerfFile() {
+    FILE *perfFile;
+    perfFile = fopen("scheduler.perf", "w");
+
+    fprintf(perfFile, "%s", "CPU Utilization = ");
+    fprintf(perfFile, "%d%%\n", (totalRunningTime * 100 / getClk()));
+
+    fprintf(perfFile, "%s", "Average Weighted Turnaround Time = ");
+    fprintf(perfFile, "%.2f\n", (sumWeightedTAT / (float) numberOfProcesses));
+
+    fprintf(perfFile, "%s", "Average Waiting Time = ");
+    fprintf(perfFile, "%.2f\n", (totalWaitingTime / (float) numberOfProcesses));
+
+    float meanWTA = sumWeightedTAT / (float) numberOfProcesses;
+    float stdDev = sqrt(abs(((sumWeightedTAT) - (numberOfProcesses * pow(meanWTA, 2)))) / (float) numberOfProcesses);
+
+    fprintf(perfFile, "%s", "Standard Deviation for Weighted Turnaround Time = ");
+    fprintf(perfFile, "%.2f\n", stdDev);
+
+    fclose(perfFile);
 }
 
 int main(int argc, char *argv[])
@@ -102,8 +132,6 @@ int main(int argc, char *argv[])
 
     // Get the selected algorithm from the command line argument
     selectedAlgorithm = atoi(argv[1]);
-    printf("Selected Algorithm: %d\n", selectedAlgorithm);
-    fflush(stdout);
 
     // Switch on the selected algorithm and allocate the appropriate data structure
     switch (selectedAlgorithm)
@@ -125,6 +153,8 @@ int main(int argc, char *argv[])
         printf("Invalid algorithm selected.\n");
         break;
     }
+
+    generatePerfFile();
 
     // Destroy the clock and exit
     destroyClk(false);

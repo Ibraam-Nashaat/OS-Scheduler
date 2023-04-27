@@ -3,8 +3,8 @@
 int algorithmFlag = 1;
 int algorithmBlockingFlag = 1; // for handling processes that arrive at the same time
 int selectedAlgorithm, quantum;
-int totalRunningTime = 0, totalWaitingTime = 0;
-float sumWeightedTAT = 0, sumWeightedTATSquared = 0;
+int totalWaitingTime = 0;
+float sumWeightedTAT = 0;
 bool isRunning;
 struct msgBuff message;
 struct PQueue *priorityQueue;
@@ -36,7 +36,6 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
     {
         printf("\033[1;34mProcess %d started at time %d\033[0m\n", runningProcess->id, getClk());
         fflush(stdout);
-        totalRunningTime += runningProcess->runningTime;
 
         char remainingTimeChar[13];
         sprintf(remainingTimeChar, "%d", currProcess->remainingTime);
@@ -69,7 +68,6 @@ void terminateProcess(int sigNum)
     }
 
     sumWeightedTAT += weightedTAT;
-    sumWeightedTATSquared += (weightedTAT * weightedTAT);
 
     free(runningProcess);
     runningProcess = NULL;
