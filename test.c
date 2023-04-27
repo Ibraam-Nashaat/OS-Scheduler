@@ -219,7 +219,7 @@ void mergeHoles(struct sortedLinkedList *LL)
         secNodePtr = secNodePtr->next;
     }
 }
-void deAllocateProcessMemory(struct ProcessStruct *process)
+void deallocateProcessMemoryFirstFit(struct ProcessStruct *process)
 {
     struct memoryNode *memoryRemovedNode;
     struct sortedLinkedListNode *llNode = find(memoryUsed->head, process->pid);
@@ -301,7 +301,7 @@ int main()
     testNode1 = memoryUsed->head;
     printf("deallcotion ");
     fflush(stdout);
-    deAllocateProcessMemory(process2);
+    deallocateProcessMemoryFirstFit(process2);
     printf("deallcotion ");
     fflush(stdout);
     printf("memoryHoles \n");
@@ -328,7 +328,7 @@ int main()
         printf("start location:%d\n", testNode1->data->startLocation);
         testNode1 = testNode1->next;
     }
-    deAllocateProcessMemory(process);
+    deallocateProcessMemoryFirstFit(process);
     printf("deallcotion ");
     fflush(stdout);
     printf("memoryHoles \n");

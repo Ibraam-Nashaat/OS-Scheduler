@@ -1,6 +1,8 @@
 #include "headers.h"
 #include "testing_functions.h"
+#include "firstFit.h"
 #include "scheduling_algorithms.h"
+
 
 void pushProcessToWaitingQueue(struct ProcessStruct process)
 {
@@ -41,20 +43,10 @@ void pushProcessToRR(struct ProcessStruct process)
         enqueue(processRunningQueue, newProcess);
     }
 }
-/*bool firstFitMemoryAllocation(struct ProcessStruct process)
-{
-    struct ProcessStruct *ptrProcess = &process;
-    
-        return allocateProcessInMemory(ptrProcess);
-    }
-    else
-        return 0;
-    // replace by algorithm implementation
-}*/
 bool tryAllocatingMemory(struct ProcessStruct process)
 {
     if (memoryPolicy == 1) // FirstFit
-        return allocateProcessInMemory(&process);
+        return allocateProcessMemoryFirstFit(&process);
     else
     {
         return 1; // change after implementing buddy memory allocation
@@ -107,8 +99,6 @@ void getProcess(int signum)
 
     // Process has been pushed to the queue
     // Up the semaphore to allow process generator to continue
-    printf("hamada\n");
-    fflush(stdout);
     up(processGeneratorAndSchedulerSemID);
 
     // check if that process was the terminating one (id = -1)

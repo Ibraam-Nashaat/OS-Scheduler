@@ -7,7 +7,7 @@ struct msgBuff message;
 struct PQueue *processRunningPriorityQueue;
 struct Queue *processRunningQueue, *processWaitingQueue;
 struct ProcessStruct *runningProcess = NULL;
-struct sortedLinkedList *memoryHoles, *memoryUsed;
+
 
 // Run a process with a given quantum time
 // currProcess: a pointer to the process structure
@@ -49,85 +49,31 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
     runningProcess->startTime = getClk();
     runningProcess->lastStopedTime = getClk();
 }
-void deAllocateProcessMemory(struct ProcessStruct *process)
-{
-    struct memoryNode *memoryRemovedNode;
-    struct sortedLinkedListNode *llNode = find(memoryUsed->head, process->id);
-    printf("isEmpty %d\n",isEmptyLL(memoryUsed));
-    if (!isEmptyLL(memoryUsed))
-    {
-        memoryRemovedNode = removeLinkedListNode(llNode, memoryUsed);
-        printf("memory removed\n");
-    }
-    if (memoryRemovedNode == NULL)
-    {
-        printf("null\n");
-        return;
-    }
-    memoryRemovedNode->id = -1;
 
-    insert(memoryHoles, memoryRemovedNode, memoryRemovedNode->startLocation);
-    mergeHoles(memoryHoles);
-    printMemory(memoryHoles,"Memory Holes after Deallocation");
-    printMemory(memoryUsed,"Memory Used after Deallocation");
-}
-
-bool allocateProcessInMemory(struct ProcessStruct *Process)
-{
-    struct memoryNode *memNode = createMemoryNode(memoryHoles->head->data->startLocation, Process->memSize, Process->id);
-    struct sortedLinkedListNode *currNode = memoryHoles->head;
-
-    fflush(stdout);
-    while (currNode != NULL && memNode->size > currNode->data->size)
-    {
-        currNode = currNode->next;
-    }
-    if (currNode == NULL)
-    {
-        printf("NO memory available\n");
-        printMemory(memoryHoles,"Memory Holes after allocation");
-        printMemory(memoryUsed,"Memory Used after allocation");
-        return false;
-    }
-    if (memNode->size == currNode->data->size)
-    {
-        // struct sortedLinkedListNode* holedNode=removeLinkedListNode(currNode,memoryHoles);
-        insert(memoryUsed, memNode, Process->priority);
-    }
-    else
-    {
-        struct sortedLinkedListNode *secCurrNode = splitNode(currNode, Process->memSize);
-        // struct sortedLinkedListNode* holedNode=removeLinkedListNode(secCurrNode,memoryHoles);
-
-        insert(memoryUsed, memNode, Process->priority);
-    }
-
-    printMemory(memoryHoles,"Memory Holes after allocation");
-    printMemory(memoryUsed,"Memory Used after allocation");
-    return true;
-}
 // This function terminates the process and frees the memory
 // sigNum: the signal number for termination
 void terminateProcess(int sigNum)
 {
-    deAllocateProcessMemory(runningProcess);
     printf("process %d finished At=%d\n", runningProcess->id, getClk());
+    if (memoryPolicy == 1)
+    {
+        deallocateProcessMemoryFirstFit(runningProcess);
+        struct ProcessStruct *waitingProcess = peekQueue(processWaitingQueue);
+        if (waitingProcess != NULL && allocateProcessMemoryFirstFit(waitingProcess))
+        {
+            waitingProcess = dequeue(processWaitingQueue);
+            if (selectedAlgorithm == 1)
+                push(processRunningPriorityQueue, waitingProcess, waitingProcess->priority);
+            else if (selectedAlgorithm == 2)
+                push(processRunningPriorityQueue, waitingProcess, waitingProcess->remainingTime);
+            else if (selectedAlgorithm == 3)
+                enqueue(processRunningQueue, waitingProcess);
+        }
+    }
     free(runningProcess);
     runningProcess = NULL;
     isRunning = false;
     fflush(stdout);
-    struct ProcessStruct *waitingProcess = peekQueue(processWaitingQueue);
-    if (waitingProcess!=NULL && allocateProcessInMemory(waitingProcess))
-    {
-        waitingProcess = dequeue(processWaitingQueue);
-        if (selectedAlgorithm == 1)
-            push(processRunningPriorityQueue, waitingProcess, waitingProcess->priority);
-        else if (selectedAlgorithm == 2)
-            push(processRunningPriorityQueue, waitingProcess, waitingProcess->remainingTime);
-        else if (selectedAlgorithm == 3)
-            enqueue(processRunningQueue, waitingProcess);
-        
-    }
 }
 
 // This function blocks the process, puts it at the end of the queue or the priority queue depending on the algorithm, and makes isRunning=false to begin another process.
