@@ -92,8 +92,10 @@ bool allocateProcessMemoryFirstFit(struct ProcessStruct *Process)
         return false;
     }
     if (memNode->size == currNode->data->size)
+    {
+        struct memoryNode *removedNode = removeLinkedListNode(currNode, memoryHoles);
         insert(memoryUsed, memNode, Process->priority);
-
+    }
     else
     {
         struct sortedLinkedListNode *secCurrNode = splitNode(currNode, Process->memSize);
