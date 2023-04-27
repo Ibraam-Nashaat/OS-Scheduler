@@ -78,9 +78,8 @@ void deallocateProcessMemoryFirstFit(struct ProcessStruct *process)
 
 bool allocateProcessMemoryFirstFit(struct ProcessStruct *Process)
 {
-    struct memoryNode *memNode = createMemoryNode(memoryHoles->head->data->startLocation, Process->memSize, Process->id);
     struct sortedLinkedListNode *currNode = memoryHoles->head;
-    while (currNode != NULL && memNode->size > currNode->data->size)
+    while (currNode != NULL && Process->memSize > currNode->data->size)
     {
         currNode = currNode->next;
     }
@@ -91,15 +90,19 @@ bool allocateProcessMemoryFirstFit(struct ProcessStruct *Process)
         printMemory(memoryUsed, "Memory Used after allocation");
         return false;
     }
-    if (memNode->size == currNode->data->size)
+    if (Process->memSize == currNode->data->size)
     {
+        
         struct memoryNode *removedNode = removeLinkedListNode(currNode, memoryHoles);
-        insert(memoryUsed, memNode, Process->priority);
+        struct memoryNode *memNode = createMemoryNode(removedNode->startLocation, Process->memSize, Process->id);
+        insert(memoryUsed, memNode,removedNode->startLocation);
     }
     else
     {
+        
         struct sortedLinkedListNode *secCurrNode = splitNode(currNode, Process->memSize);
-        insert(memoryUsed, memNode, Process->priority);
+        struct memoryNode *memNode = createMemoryNode(secCurrNode->data->startLocation, Process->memSize, Process->id);
+        insert(memoryUsed, memNode, secCurrNode->data->startLocation);
     }
 
     printMemory(memoryHoles, "Memory Holes after allocation");
