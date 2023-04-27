@@ -1,6 +1,8 @@
 #include "headers.h"
 int schedulerPID;
 
+int totalRunningTime = 0;
+
 void clearResources(int signum)
 {
     msgctl(messageQueueID, IPC_RMID, (struct msqid_ds *)0);
@@ -21,6 +23,7 @@ void readFile(struct Queue *processQueue)
 
     while (fscanf(file, "%d\t%d\t%d\t%d", &id, &arrivalTime, &runningTime, &priority) != EOF)
     {
+        totalRunningTime += runningTime;
         struct ProcessStruct *readProcess = create_process(id, arrivalTime, priority, runningTime);
         enqueue(processQueue, readProcess);
     }
@@ -69,7 +72,7 @@ int main(int argc, char *argv[])
     // 1. Read the input files.
     struct Queue *processQueue = createQueue();
     readFile(processQueue);
-    
+
     // 2. Ask the user for the chosen scheduling algorithm and its parameters, if there are any.
     int algo;
     int quantum = getSchedulingAlgoFromUser(&algo);
@@ -87,10 +90,11 @@ int main(int argc, char *argv[])
     schedulerPID = fork();
     if (schedulerPID == 0)
     {
-        char algoAsChar[13], quantumAsChar[13];
+        char algoAsChar[13], quantumAsChar[13], totalRunningTimeAsChar[13];
         sprintf(algoAsChar, "%d", algo);
         sprintf(quantumAsChar, "%d", quantum);
-        char *args[] = {"./scheduler.out", algoAsChar, quantumAsChar, NULL};
+        sprintf(totalRunningTimeAsChar, "%d", totalRunningTime);
+        char *args[] = {"./scheduler.out", algoAsChar, quantumAsChar, totalRunningTimeAsChar, NULL};
         execvp(args[0], args);
     }
     // 4. Use this function after creating the clock process to initialize clock
