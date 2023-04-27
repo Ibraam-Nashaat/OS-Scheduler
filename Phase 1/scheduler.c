@@ -97,7 +97,7 @@ void generatePerfFile()
     FILE *perfFile;
     perfFile = fopen("scheduler.perf", "w");
 
-    fprintf(perfFile, "CPU Utilization = %d%%\n", (totalRunningTime * 100 / getClk()));
+    fprintf(perfFile, "CPU utilization = %d%%\n", (totalRunningTime * 100 / getClk()));
 
     fprintf(perfFile, "Avg WTA = %.2f\n", (sumWeightedTAT / (float)numberOfProcesses));
 
