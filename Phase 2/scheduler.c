@@ -10,7 +10,7 @@ void pushProcessToWaitingQueue(struct ProcessStruct process)
     {
         struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
                                                           process.runningTime, process.memSize);
-        enqueue(processWaitingQueue, newProcess);
+        enqueue(waitingProcessesQueue, newProcess);
     }
 }
 
@@ -20,7 +20,7 @@ void pushProcessToSRTN(struct ProcessStruct process)
     {
         struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
                                                           process.runningTime, process.memSize);
-        push(processRunningPriorityQueue, newProcess, newProcess->remainingTime);
+        push(readyProcessesPriorityQueue, newProcess, newProcess->remainingTime);
     }
 }
 
@@ -30,7 +30,7 @@ void pushProcessToHPF(struct ProcessStruct process)
     {
         struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
                                                           process.runningTime, process.memSize);
-        push(processRunningPriorityQueue, newProcess, newProcess->priority);
+        push(readyProcessesPriorityQueue, newProcess, newProcess->priority);
     }
 }
 
@@ -40,7 +40,7 @@ void pushProcessToRR(struct ProcessStruct process)
     {
         struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
                                                           process.runningTime, process.memSize);
-        enqueue(processRunningQueue, newProcess);
+        enqueue(readyProcessesQueue, newProcess);
     }
 }
 bool tryAllocatingMemory(struct ProcessStruct process)
@@ -145,23 +145,23 @@ int main(int argc, char *argv[])
         insert(memoryHoles, memoryNode, 0);
     }
 
-    processWaitingQueue = createQueue(); // Queue containing processes that can't be allocated
+    waitingProcessesQueue = createQueue(); // Queue containing processes that can't be allocated
 
     // Switch on the selected algorithm and allocate the appropriate data structure
     switch (selectedAlgorithm)
     {
     case HPF_ALGORITHM:
-        processRunningPriorityQueue = createPriorityQueue();
-        HPF(processRunningPriorityQueue);
+        readyProcessesPriorityQueue = createPriorityQueue();
+        HPF(readyProcessesPriorityQueue);
         break;
     case SRTN_ALGORITHM:
-        processRunningPriorityQueue = createPriorityQueue();
-        SRTN(processRunningPriorityQueue);
+        readyProcessesPriorityQueue = createPriorityQueue();
+        SRTN(readyProcessesPriorityQueue);
         break;
     case RR_ALGORITHM:
-        processRunningQueue = createQueue();
+        readyProcessesQueue = createQueue();
         quantum = atoi(argv[2]);
-        RR(processRunningQueue, quantum);
+        RR(readyProcessesQueue, quantum);
         break;
     default:
         printf("Invalid algorithm selected.\n");

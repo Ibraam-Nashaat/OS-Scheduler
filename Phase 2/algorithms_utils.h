@@ -4,8 +4,8 @@ int algorithmBlockingFlag = 1; // for handling processes that arrive at the same
 int selectedAlgorithm, quantum, memoryPolicy;
 bool isRunning;
 struct msgBuff message;
-struct PQueue *processRunningPriorityQueue;
-struct Queue *processRunningQueue, *processWaitingQueue;
+struct PQueue *readyProcessesPriorityQueue;
+struct Queue *readyProcessesQueue, *waitingProcessesQueue;
 struct ProcessStruct *runningProcess = NULL;
 
 
@@ -58,16 +58,16 @@ void terminateProcess(int sigNum)
     if (memoryPolicy == 1)
     {
         deallocateProcessMemoryFirstFit(runningProcess);
-        struct ProcessStruct *waitingProcess = peekQueue(processWaitingQueue);
+        struct ProcessStruct *waitingProcess = peekQueue(waitingProcessesQueue);
         if (waitingProcess != NULL && allocateProcessMemoryFirstFit(waitingProcess))
         {
-            waitingProcess = dequeue(processWaitingQueue);
+            waitingProcess = dequeue(waitingProcessesQueue);
             if (selectedAlgorithm == 1)
-                push(processRunningPriorityQueue, waitingProcess, waitingProcess->priority);
+                push(readyProcessesPriorityQueue, waitingProcess, waitingProcess->priority);
             else if (selectedAlgorithm == 2)
-                push(processRunningPriorityQueue, waitingProcess, waitingProcess->remainingTime);
+                push(readyProcessesPriorityQueue, waitingProcess, waitingProcess->remainingTime);
             else if (selectedAlgorithm == 3)
-                enqueue(processRunningQueue, waitingProcess);
+                enqueue(readyProcessesQueue, waitingProcess);
         }
     }
     free(runningProcess);
@@ -84,7 +84,7 @@ void blockProcess()
         // For round robin algorithm, enqueue the process at the end of the queue
         // queue: a pointer to the queue structure
         // runningProcess: a pointer to the process structure
-        enqueue(processRunningQueue, runningProcess);
+        enqueue(readyProcessesQueue, runningProcess);
     }
     else
     {
@@ -94,7 +94,7 @@ void blockProcess()
         runningProcess->lastStopedTime = getClk();
         kill(runningProcess->pid, INTERRUPT_SIGNAL);
         kill(runningProcess->pid, SIGSTOP);
-        push(processRunningPriorityQueue, runningProcess, runningProcess->remainingTime);
+        push(readyProcessesPriorityQueue, runningProcess, runningProcess->remainingTime);
     }
     printf("id = %d Blocked pid = %d remainingtime = %d current time = %d \n", runningProcess->id, runningProcess->pid, runningProcess->remainingTime, getClk());
     isRunning = false;
