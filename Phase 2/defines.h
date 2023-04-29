@@ -18,3 +18,6 @@
 #define HPF_ALGORITHM 1
 #define SRTN_ALGORITHM 2
 #define RR_ALGORITHM 3
+
+#define FIRST_FIT_POLICY 1
+#define BUDDY_POLICY 2

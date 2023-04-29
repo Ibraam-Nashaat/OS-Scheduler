@@ -8,7 +8,6 @@ struct PQueue *readyProcessesPriorityQueue;
 struct Queue *readyProcessesQueue, *waitingProcessesQueue;
 struct ProcessStruct *runningProcess = NULL;
 
-
 // Run a process with a given quantum time
 // currProcess: a pointer to the process structure
 // quantum: the quantum time for RR algorithm
@@ -55,14 +54,16 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
 void terminateProcess(int sigNum)
 {
     printf("process %d finished At=%d\n", runningProcess->id, getClk());
-    if (memoryPolicy == 1)
-    {
-        deallocateProcessMemoryFirstFit(runningProcess);
+    switch(memoryPolicy){
+        case FIRST_FIT_POLICY:
+            deallocateProcessMemoryFirstFit(runningProcess);
+            break;
+
+        case BUDDY_POLICY:
+            deleteFromBuddyMemory(buddyMemoryNode, runningProcess->id, 0, 1024);
+            break;
     }
-    else{
-        deleteFromBuddyMemory(buddyMemoryNode, runningProcess->id, 0, 1024);
-    }
-    
+
     free(runningProcess);
     runningProcess = NULL;
     isRunning = false;

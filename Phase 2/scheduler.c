@@ -4,7 +4,6 @@
 #include "buddyAllocation.h"
 #include "scheduling_algorithms.h"
 
-
 void pushProcessToWaitingQueue(struct ProcessStruct process)
 {
     if (process.id != -1)
@@ -138,16 +137,22 @@ int main(int argc, char *argv[])
     memoryPolicy = atoi(argv[3]);
     printf("Selected Algorithm: %d\n", selectedAlgorithm);
     fflush(stdout);
-    if (memoryPolicy == 1)
-    {
-        memoryHoles = createSortedLinkedList();
-        memoryUsed = createSortedLinkedList();
-        struct memoryNode *memoryNode = createMemoryNode(0, 1024, -1);
-        insert(memoryHoles, memoryNode, 0);
-    }
-    else
-    {
-        buddyMemoryNode = createTreeNode(1024);
+
+    switch(memoryPolicy){
+        case FIRST_FIT_POLICY:
+            memoryHoles = createSortedLinkedList();
+            memoryUsed = createSortedLinkedList();
+            struct memoryNode *memoryNode = createMemoryNode(0, 1024, -1);
+            insert(memoryHoles, memoryNode, 0);
+            break;
+
+        case BUDDY_POLICY:
+            buddyMemoryNode = createTreeNode(1024);
+            break;
+
+        default:
+            printf("Invalid policy selected.\n");
+            break;
     }
 
     waitingProcessesQueue = createQueue(); // Queue containing processes that can't be allocated
