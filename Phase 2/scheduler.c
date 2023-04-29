@@ -1,6 +1,7 @@
 #include "headers.h"
 #include "testing_functions.h"
 #include "firstFit.h"
+#include "buddyAllocation.h"
 #include "scheduling_algorithms.h"
 
 
@@ -49,7 +50,7 @@ bool tryAllocatingMemory(struct ProcessStruct process)
         return allocateProcessMemoryFirstFit(&process);
     else
     {
-        return 1; // change after implementing buddy memory allocation
+        return addToBuddyMemory(buddyMemoryNode, &process, 0, 1024);
     }
 }
 void getProcess(int signum)
@@ -143,6 +144,10 @@ int main(int argc, char *argv[])
         memoryUsed = createSortedLinkedList();
         struct memoryNode *memoryNode = createMemoryNode(0, 1024, -1);
         insert(memoryHoles, memoryNode, 0);
+    }
+    else
+    {
+        buddyMemoryNode = createTreeNode(1024);
     }
 
     waitingProcessesQueue = createQueue(); // Queue containing processes that can't be allocated

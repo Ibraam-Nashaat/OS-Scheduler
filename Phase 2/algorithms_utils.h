@@ -33,11 +33,11 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
     {
         printf("process %d started at time %d \n", runningProcess->id, getClk());
         fflush(stdout);
-        char remainigTimeChar[13];
-        sprintf(remainigTimeChar, "%d", currProcess->remainingTime);
+        char remainingTimeChar[13];
+        sprintf(remainingTimeChar, "%d", currProcess->remainingTime);
         char quantumChar[13];
         sprintf(quantumChar, "%d", quantum);
-        char *argv[] = {"./process.out", remainigTimeChar, quantumChar, NULL}; // send remaining time and quantum as arguments
+        char *argv[] = {"./process.out", remainingTimeChar, quantumChar, NULL}; // send remaining time and quantum as arguments
         int execlResult = execvp(argv[0], argv);
         if (execlResult == -1)
         {
@@ -58,22 +58,27 @@ void terminateProcess(int sigNum)
     if (memoryPolicy == 1)
     {
         deallocateProcessMemoryFirstFit(runningProcess);
-        struct ProcessStruct *waitingProcess = peekQueue(waitingProcessesQueue);
-        if (waitingProcess != NULL && allocateProcessMemoryFirstFit(waitingProcess))
-        {
-            waitingProcess = dequeue(waitingProcessesQueue);
-            if (selectedAlgorithm == 1)
-                push(readyProcessesPriorityQueue, waitingProcess, waitingProcess->priority);
-            else if (selectedAlgorithm == 2)
-                push(readyProcessesPriorityQueue, waitingProcess, waitingProcess->remainingTime);
-            else if (selectedAlgorithm == 3)
-                enqueue(readyProcessesQueue, waitingProcess);
-        }
     }
+    else{
+        deleteFromBuddyMemory(buddyMemoryNode, runningProcess->id, 0, 1024);
+    }
+    
     free(runningProcess);
     runningProcess = NULL;
     isRunning = false;
     fflush(stdout);
+
+    struct ProcessStruct *waitingProcess = peekQueue(waitingProcessesQueue);
+    if (waitingProcess != NULL && allocateProcessMemoryFirstFit(waitingProcess))
+    {
+        waitingProcess = dequeue(waitingProcessesQueue);
+        if (selectedAlgorithm == 1)
+            push(readyProcessesPriorityQueue, waitingProcess, waitingProcess->priority);
+        else if (selectedAlgorithm == 2)
+            push(readyProcessesPriorityQueue, waitingProcess, waitingProcess->remainingTime);
+        else if (selectedAlgorithm == 3)
+            enqueue(readyProcessesQueue, waitingProcess);
+    }
 }
 
 // This function blocks the process, puts it at the end of the queue or the priority queue depending on the algorithm, and makes isRunning=false to begin another process.
