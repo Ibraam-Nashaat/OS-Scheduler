@@ -60,7 +60,7 @@ void terminateProcess(int sigNum)
             break;
 
         case BUDDY_POLICY:
-            deleteFromBuddyMemory(buddyMemoryNode, runningProcess->id, 0, 1024);
+            deallocateProcessMemoryBuddy(buddyMemoryNode, runningProcess->id, 0, 1024);
             break;
     }
 

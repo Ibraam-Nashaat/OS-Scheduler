@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 struct TreeNode
 {
     struct ProcessStruct *data;
@@ -21,7 +18,7 @@ struct TreeNode *createTreeNode(int memSize)
 
 struct TreeNode *buddyMemoryNode;
 
-int addToBuddyMemory(struct TreeNode *currNode, struct ProcessStruct *p, int left, int right)
+int allocateProcessMemoryBuddy(struct TreeNode *currNode, struct ProcessStruct *p, int left, int right)
 {
 
     if (p->memSize > currNode->memSize)
@@ -33,34 +30,24 @@ int addToBuddyMemory(struct TreeNode *currNode, struct ProcessStruct *p, int lef
     {
         int mid = (right + left) / 2;
 
-        // try left
         if (currNode->left == NULL)
             currNode->left = createTreeNode(currNode->memSize / 2);
-        // printf("the Process %d went left %d\n",p->id , currNode->memSize);
 
         int try_left = -1;
         if (currNode->left->data == NULL)
-            try_left = addToBuddyMemory(currNode->left, p, left, mid);
+            try_left = allocateProcessMemoryBuddy(currNode->left, p, left, mid);
 
         if (try_left == 1)
             return 1;
 
-        // printf("fault in left %d\n", currNode->memSize);
-        //  try right
-
         int try_right = -1;
         if (currNode->right == NULL)
             currNode->right = createTreeNode(currNode->memSize / 2);
-        // printf("the Process %d went right %d\n",p->id ,currNode->memSize);
 
         if (currNode->right->data == NULL)
-            try_right = addToBuddyMemory(currNode->right, p, mid, right);
+            try_right = allocateProcessMemoryBuddy(currNode->right, p, mid, right);
         if (try_right == 1)
             return 1;
-        // return -1
-        // printf("fault in right %d\n", currNode->memSize);
-
-        // printf("error no space in the TreeNode %d %d\n",p->id, currNode->memSize);
         return 0;
     }
     else if (currNode->data == NULL)
@@ -71,7 +58,7 @@ int addToBuddyMemory(struct TreeNode *currNode, struct ProcessStruct *p, int lef
     }
 }
 
-struct TreeNode *deleteFromBuddyMemory(struct TreeNode *currNode, int id, int left, int right)
+struct TreeNode *deallocateProcessMemoryBuddy(struct TreeNode *currNode, int id, int left, int right)
 {
     if (currNode == NULL)
         return NULL;
@@ -89,8 +76,8 @@ struct TreeNode *deleteFromBuddyMemory(struct TreeNode *currNode, int id, int le
     }
     else
     {
-        currNode->left = deleteFromBuddyMemory(currNode->left, id, left, mid);
-        currNode->right = deleteFromBuddyMemory(currNode->right, id, mid, right);
+        currNode->left = deallocateProcessMemoryBuddy(currNode->left, id, left, mid);
+        currNode->right = deallocateProcessMemoryBuddy(currNode->right, id, mid, right);
 
         if (currNode->left == NULL && currNode->right == NULL && currNode->data == NULL)
         {
@@ -101,48 +88,3 @@ struct TreeNode *deleteFromBuddyMemory(struct TreeNode *currNode, int id, int le
         return currNode;
     }
 }
-
-/* int main()
-{
-    memory = createTreeNode(1024);
-
-    struct Process * p1 = (struct Process*) malloc(sizeof(struct Process));
-    p1->id = 1;
-    p1->memSize = 200;
-    addToBuddyMemory(memory,p1 ,0, 1024);
-
-    struct Process * p2 = (struct Process*) malloc(sizeof(struct Process));
-    p2->id = 2;
-    p2->memSize = 200;
-    addToBuddyMemory(memory,p2 ,0, 1024);
-
-    struct Process * p3 = (struct Process*) malloc(sizeof(struct Process));
-    p3->id = 3;
-    p3->memSize = 200;
-    addToBuddyMemory(memory,p3, 0, 1024);
-
-    struct Process * p4 = (struct Process*) malloc(sizeof(struct Process));
-    p4->id = 4;
-    p4->memSize = 100;
-    addToBuddyMemory(memory, p4, 0, 1024);
-
-    struct Process * p5 = (struct Process*) malloc(sizeof(struct Process));
-    p5->id = 5;
-    p5->memSize = 100;
-    addToBuddyMemory(memory, p5, 0, 1024);
-
-    deleteFromBuddyMemory(memory, p1->id, 0, 1024);
-    deleteFromBuddyMemory(memory, 2, 0, 1024);
-
-    p1 = (struct Process*) malloc(sizeof(struct Process));
-    p1->id = 1;
-    p1->memSize = 200;
-    addToBuddyMemory(memory,p1 ,0, 1024);
-
-    p2 = (struct Process*) malloc(sizeof(struct Process));
-    p2->id = 2;
-    p2->memSize = 200;
-    addToBuddyMemory(memory,p2 ,0, 1024);
-
-    return 0;
-}  */
