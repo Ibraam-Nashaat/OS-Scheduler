@@ -24,7 +24,7 @@ int allocateProcessMemoryBuddyRec(struct TreeNode *node, struct ProcessStruct *p
         return 0; // Memory allocation failed
     }
 
-    if((node->data != NULL && node->data->id != -1))
+    if (node->data != NULL && node->data->id != -1)
         return 0;
 
     if (node->nodeSize / 2 >= process->memSize)
@@ -37,8 +37,10 @@ int allocateProcessMemoryBuddyRec(struct TreeNode *node, struct ProcessStruct *p
         int leftSubtreeAllocation = allocateProcessMemoryBuddyRec(node->left, process, leftBound, midPoint);
 
         if (leftSubtreeAllocation == 1){
-            node->data = (struct ProcessStruct *) malloc(sizeof(struct ProcessStruct));
-            node->data->id = -1;
+            if(node->data == NULL){
+                node->data = (struct ProcessStruct *) malloc(sizeof(struct ProcessStruct));
+                node->data->id = -1;
+            }
             return 1; // Memory allocation successful
         }
 
@@ -48,7 +50,7 @@ int allocateProcessMemoryBuddyRec(struct TreeNode *node, struct ProcessStruct *p
         int rightSubtreeAllocation = allocateProcessMemoryBuddyRec(node->right, process, midPoint, rightBound);
 
         if (rightSubtreeAllocation == 1){
-            if(node->data != NULL){
+            if(node->data == NULL){
                 node->data = (struct ProcessStruct *) malloc(sizeof(struct ProcessStruct));
                 node->data->id = -1;
             }
