@@ -15,19 +15,24 @@ struct ProcessStruct {
 };
 
 struct TreeNode {
-    struct ProcessStruct* data;
     struct TreeNode* left, *right;
     int size;
-    int splitted;
+    int isSplitted;
+    int hasData;
+    int processId;
+    int processMemSize;
 };
 
 struct TreeNode* createTreeNode(int size) {
     struct TreeNode* n = (struct TreeNode *)malloc(sizeof(struct TreeNode));
-    n->data = NULL;
     n->left = NULL;
     n->right = NULL;
     n->size = size;
-    int splitted = 0;
+    n->isSplitted = 0;
+    n->hasData = 0;
+    n->processId = -1;
+    n->processMemSize = -1;
+    
     return n;
 }
 
@@ -40,7 +45,7 @@ int allocateProcessMemoryBuddyRec(struct TreeNode* currNode, struct ProcessStruc
         return -1;
     }
     
-    if((currNode->data != NULL && currNode->data->id != -1)) {
+    if((currNode->hasData == 1 && currNode->isSplitted == 0)) {
         return -1;
     }
 
@@ -57,8 +62,8 @@ int allocateProcessMemoryBuddyRec(struct TreeNode* currNode, struct ProcessStruc
         try_left = allocateProcessMemoryBuddyRec(currNode->left, p, left, mid);
 
         if(try_left == 1) {
-            currNode->data = (struct ProcessStruct *)malloc(sizeof(struct ProcessStruct));
-            currNode->data->id = -1;
+            currNode->hasData = 1;
+            currNode->isSplitted = 1;
             return 1;
         }
 
@@ -69,15 +74,17 @@ int allocateProcessMemoryBuddyRec(struct TreeNode* currNode, struct ProcessStruc
 
         try_right = allocateProcessMemoryBuddyRec(currNode->right, p, mid, right);
         if(try_right == 1) {
-            if(currNode->data != NULL) {
-                currNode->data = (struct ProcessStruct *)malloc(sizeof(struct ProcessStruct));
-                currNode->data->id = -1;
+            if(currNode->hasData == 1) {
+                currNode->hasData = 1;
+                currNode->isSplitted = 1;
             }
             return 1;
         }
         return -1;
-    } else if(currNode->data == NULL) {
-        currNode->data = p;
+    } else if(currNode->hasData == 0) {
+        currNode->hasData = 1;
+        currNode->processId = p->id;
+        currNode->processMemSize = p->memSize;
         printf("the process %d settled from %d to %d size %d\n", p->id, left, right - 1, currNode->size);
         return 1;
     } else {
@@ -95,14 +102,13 @@ struct TreeNode* deallocateProcessMemoryBuddyRec(struct TreeNode* currNode, int 
         return NULL;
     }
 
-    printf("Trying to remove id %d current node has %d\n", id, currNode->data->id);
+    printf("Trying to remove id %d current node has %d\n", id, currNode->processId);
 
     int mid = (right + left) / 2;
 
-    if(currNode->data != NULL && currNode->data->id == id) {
-        printf("the process %d removed from %d to %d size %d\n", currNode->data->id, left, right - 1, currNode->size);
-        free(currNode->data);
-        currNode->data = NULL;
+    if(currNode->hasData == 1 && currNode->processId == id) {
+        printf("the process %d removed from %d to %d size %d\n", currNode->processId, left, right - 1, currNode->size);
+        currNode->hasData = 0;
         if(currNode->left == NULL && currNode->right == NULL) {
             free(currNode);
             currNode = NULL;
@@ -120,7 +126,9 @@ struct TreeNode* deallocateProcessMemoryBuddyRec(struct TreeNode* currNode, int 
             while(leftmost->right != NULL) {
                 leftmost = leftmost->right;
             }
-            currNode->data = leftmost->data;
+            currNode->processId = leftmost->processId;
+            currNode->processMemSize = leftmost->processMemSize;
+            currNode->isSplitted = leftmost->isSplitted;
             free(leftmost);
         }
         return currNode;
@@ -128,7 +136,7 @@ struct TreeNode* deallocateProcessMemoryBuddyRec(struct TreeNode* currNode, int 
         currNode->left = deallocateProcessMemoryBuddyRec(currNode->left, id, left, mid);
         currNode->right = deallocateProcessMemoryBuddyRec(currNode->right, id, mid, right);
 
-        if(currNode->left == NULL && currNode->right == NULL && currNode->data->id == -1) {
+        if(currNode->left == NULL && currNode->right == NULL && currNode->isSplitted == 1) {
             free(currNode);
             currNode = NULL;
             return NULL;
