@@ -134,7 +134,7 @@ int main()
 
     struct process * p1 = (struct process*) malloc(sizeof(struct process));
     p1->id = 1;
-    p1->size = 100;
+    p1->size = 400;
     add_to_memory(memory,p1 ,0, 1024);
 
     struct process * p2 = (struct process*) malloc(sizeof(struct process));
@@ -152,18 +152,18 @@ int main()
     p4->size = 425;
     add_to_memory(memory, p4, 0, 1024);
 
-    // struct process * p5 = (struct process*) malloc(sizeof(struct process));
-    // p5->id = 5;
-    // p5->size = 100;
-    // add_to_memory(memory, p5, 0, 1024);
+    struct process * p5 = (struct process*) malloc(sizeof(struct process));
+    p5->id = 5;
+    p5->size = 100;
+    add_to_memory(memory, p5, 0, 1024);
 
     // struct process * p6 = (struct process*) malloc(sizeof(struct process));
     // p5->id = 6;
     // p5->size = 100;
     // add_to_memory(memory, p6, 0, 1024);
 
-    // delete_from_memory(memory, p1->id, 0, 1024);
-    // delete_from_memory(memory, 2, 0, 1024);
+    delete_from_memory(memory, p1->id, 0, 1024);
+    delete_from_memory(memory, 2, 0, 1024);
 
     // p1 = (struct process*) malloc(sizeof(struct process));
     // p1->id = 1;
