@@ -70,6 +70,7 @@ void terminateProcess(int sigNum)
     fflush(stdout);
 
     struct ProcessStruct *waitingProcess = peekQueue(waitingProcessesQueue);
+    //printf("PROCESS ID IS %d AND MEMSIZE IS %d\n", waitingProcess->id, waitingProcess->memSize);
 
     if (waitingProcess != NULL)
     {

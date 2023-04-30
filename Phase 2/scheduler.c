@@ -45,8 +45,9 @@ void pushProcessToRR(struct ProcessStruct process)
 }
 bool tryAllocatingMemory(struct ProcessStruct process)
 {
-    if (memoryPolicy == 1) // FirstFit
+    if (memoryPolicy == 1){
         return allocateProcessMemoryFirstFit(&process);
+    }
     else
     {
         return allocateProcessMemoryBuddy(&process);
