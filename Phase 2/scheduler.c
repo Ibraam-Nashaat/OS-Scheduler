@@ -49,7 +49,7 @@ bool tryAllocatingMemory(struct ProcessStruct process)
         return allocateProcessMemoryFirstFit(&process);
     else
     {
-        return allocateProcessMemoryBuddy(buddyMemoryNode, &process, 0, 1024);
+        return allocateProcessMemoryBuddy(&process);
     }
 }
 void getProcess(int signum)

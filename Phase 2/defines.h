@@ -19,5 +19,7 @@
 #define SRTN_ALGORITHM 2
 #define RR_ALGORITHM 3
 
+#define MEMORY_SIZE 1024
+
 #define FIRST_FIT_POLICY 1
 #define BUDDY_POLICY 2
