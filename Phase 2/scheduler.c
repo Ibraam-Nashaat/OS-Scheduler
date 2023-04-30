@@ -1,8 +1,12 @@
+#include "math.h"
 #include "headers.h"
 #include "testing_functions.h"
 #include "firstFit.h"
 #include "buddyAllocation.h"
 #include "scheduling_algorithms.h"
+
+int numberOfProcesses = 0;
+int totalRunningTime = 0;
 
 void pushProcessToWaitingQueue(struct ProcessStruct process)
 {
@@ -65,6 +69,9 @@ void getProcess(int signum)
         perror("Error in receiving from msg queue\n");
     }
 
+    numberOfProcesses++;
+    totalRunningTime += message.process.runningTime;
+
     switch (selectedAlgorithm)
     {
     case 1:
@@ -114,13 +121,34 @@ void getProcess(int signum)
         algorithmFlag = 0;
     }
 }
+
 void changeAlgorithmFlag(int sigNum)
 {
     algorithmFlag = 0;
 }
+
 void changeBlockingFlag(int signum)
 {
     algorithmBlockingFlag = !algorithmBlockingFlag;
+}
+
+void generatePerfFile()
+{
+    FILE *perfFile;
+    perfFile = fopen("scheduler.perf", "w");
+
+    fprintf(perfFile, "CPU utilization = %d%%\n", (totalRunningTime * 100 / getClk()));
+
+    fprintf(perfFile, "Avg WTA = %.2f\n", (sumWeightedTAT / (float)numberOfProcesses));
+
+    fprintf(perfFile, "Avg Waiting = %.2f\n", (totalWaitingTime / (float)numberOfProcesses));
+
+    float meanWTA = sumWeightedTAT / (float)numberOfProcesses;
+    float stdDev = sqrt(abs(((sumWeightedTAT) - (numberOfProcesses * pow(meanWTA, 2)))) / (float)numberOfProcesses);
+
+    fprintf(perfFile,"Std WTA = %.2f\n", stdDev);
+
+    fclose(perfFile);
 }
 
 int main(int argc, char *argv[])
@@ -142,8 +170,9 @@ int main(int argc, char *argv[])
     // Get the selected algorithm from the command line argument
     selectedAlgorithm = atoi(argv[1]);
     memoryPolicy = atoi(argv[3]);
-    printf("Selected Algorithm: %d\n", selectedAlgorithm);
-    fflush(stdout);
+
+    logFile = fopen("scheduler.log", "w");
+    fprintf(logFile, "#At time x process y state arr w total z remain y wait k\n");
 
     switch(memoryPolicy){
         case FIRST_FIT_POLICY:
@@ -184,6 +213,10 @@ int main(int argc, char *argv[])
         printf("Invalid algorithm selected.\n");
         break;
     }
+
+    fclose(logFile);
+
+    generatePerfFile();
 
     // Destroy the clock and exit
     destroyClk(false);
