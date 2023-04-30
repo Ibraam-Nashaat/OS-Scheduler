@@ -113,7 +113,7 @@ struct node* delete_from_memory(struct node* currNode, int id, int left, int rig
         currNode->left = delete_from_memory(currNode->left, id, left, mid);
         currNode->right = delete_from_memory(currNode->right, id, mid, right);
 
-        if(currNode->left == NULL && currNode->right == NULL && currNode->data == NULL)   
+        if(currNode->left == NULL && currNode->right == NULL && currNode->data->id == -1)   
             {
                 free(currNode);
                 currNode = NULL;
@@ -131,7 +131,7 @@ int main()
 
     struct process * p1 = (struct process*) malloc(sizeof(struct process));
     p1->id = 1;
-    p1->size = 150;
+    p1->size = 400;
     add_to_memory(memory,p1 ,0, 1024);
 
     struct process * p2 = (struct process*) malloc(sizeof(struct process));
