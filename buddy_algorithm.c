@@ -35,6 +35,9 @@ int add_to_memory(struct node* currNode ,struct process* p, int left, int right)
         return -1;
     }
     
+    if((currNode->data != NULL && currNode->data->id != -1))
+        return -1;
+
     if( currNode->size / 2 >= p->size)
     {
         int mid = (right + left) / 2;
@@ -131,16 +134,16 @@ int main()
 
     struct process * p1 = (struct process*) malloc(sizeof(struct process));
     p1->id = 1;
-    p1->size = 400;
+    p1->size = 100;
     add_to_memory(memory,p1 ,0, 1024);
 
     struct process * p2 = (struct process*) malloc(sizeof(struct process));
     p2->id = 2;
-    p2->size = 200;
+    p2->size = 100;
     add_to_memory(memory,p2 ,0, 1024);
 
     struct process * p3 = (struct process*) malloc(sizeof(struct process));
-    p3->id = 3;
+    p3->id = 250;
     p3->size = 250;
     add_to_memory(memory,p3, 0, 1024);
 
