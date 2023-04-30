@@ -24,6 +24,9 @@ int allocateProcessMemoryBuddyRec(struct TreeNode *node, struct ProcessStruct *p
         return 0; // Memory allocation failed
     }
 
+    if((node->data != NULL && node->data->id != -1))
+        return 0;
+
     if (node->nodeSize / 2 >= process->memSize)
     {
         int midPoint = (rightBound + leftBound) / 2;
