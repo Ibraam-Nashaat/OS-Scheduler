@@ -70,15 +70,31 @@ void terminateProcess(int sigNum)
     fflush(stdout);
 
     struct ProcessStruct *waitingProcess = peekQueue(waitingProcessesQueue);
-    if (waitingProcess != NULL && allocateProcessMemoryFirstFit(waitingProcess))
+
+    if (waitingProcess != NULL)
     {
-        waitingProcess = dequeue(waitingProcessesQueue);
-        if (selectedAlgorithm == 1)
-            push(readyProcessesPriorityQueue, waitingProcess, waitingProcess->priority);
-        else if (selectedAlgorithm == 2)
-            push(readyProcessesPriorityQueue, waitingProcess, waitingProcess->remainingTime);
-        else if (selectedAlgorithm == 3)
-            enqueue(readyProcessesQueue, waitingProcess);
+        int firstFitAllocation = 0, buddyAllocation = 0;
+        switch(memoryPolicy){
+            case FIRST_FIT_POLICY:
+                printf("Trying to allocate %d with first fit\n", waitingProcess->id);
+                firstFitAllocation = allocateProcessMemoryFirstFit(waitingProcess);
+                break;
+
+            case BUDDY_POLICY:
+                printf("Trying to allocate %d with buddy\n", waitingProcess->id);
+                buddyAllocation = allocateProcessMemoryBuddy(waitingProcess);
+                break;
+        }
+        if(firstFitAllocation == 1 || buddyAllocation == 1){
+            waitingProcess = dequeue(waitingProcessesQueue);
+            printf("Process %d is dequeued from the waiting queue\n", waitingProcess->id);
+            if (selectedAlgorithm == 1)
+                push(readyProcessesPriorityQueue, waitingProcess, waitingProcess->priority);
+            else if (selectedAlgorithm == 2)
+                push(readyProcessesPriorityQueue, waitingProcess, waitingProcess->remainingTime);
+            else if (selectedAlgorithm == 3)
+                enqueue(readyProcessesQueue, waitingProcess);
+        }
     }
 }
 

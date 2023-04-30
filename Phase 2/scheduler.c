@@ -69,8 +69,10 @@ void getProcess(int signum)
     case 1:
         if (tryAllocatingMemory(message.process))
             pushProcessToHPF(message.process);
-        else
+        else{
+            printf("Pushing process %d to waiting queue\n", message.process.id);
             pushProcessToWaitingQueue(message.process);
+        }
         break;
     case 2:
         if (tryAllocatingMemory(message.process))
@@ -86,14 +88,18 @@ void getProcess(int signum)
                     runningProcess->remainingTime = tempRunningRime;
             }
         }
-        else
+        else{
+            printf("Pushing process %d to waiting queue\n", message.process.id);
             pushProcessToWaitingQueue(message.process);
+        }
         break;
     case 3:
         if (tryAllocatingMemory(message.process))
             pushProcessToRR(message.process);
-        else
+        else{
+            printf("Pushing process %d to waiting queue\n", message.process.id);
             pushProcessToWaitingQueue(message.process);
+        }
         break;
     }
 
