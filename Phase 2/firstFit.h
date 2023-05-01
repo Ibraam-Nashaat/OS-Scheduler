@@ -68,6 +68,7 @@ void deallocateProcessMemoryFirstFit(struct ProcessStruct *process)
         printf("null\n");
         return;
     }
+    logMemoryDeallocation(getClk(),process->memSize,process->id,memoryRemovedNode->startLocation,memoryRemovedNode->endLocation);
     memoryRemovedNode->id = -1;
 
     insert(memoryHoles, memoryRemovedNode, memoryRemovedNode->startLocation);
@@ -96,6 +97,7 @@ bool allocateProcessMemoryFirstFit(struct ProcessStruct *Process)
         struct memoryNode *removedNode = removeLinkedListNode(currNode, memoryHoles);
         struct memoryNode *memNode = createMemoryNode(removedNode->startLocation, Process->memSize, Process->id);
         insert(memoryUsed, memNode,removedNode->startLocation);
+        logMemoryAllocation(getClk(),Process->memSize,Process->id,memNode->startLocation,memNode->endLocation);
     }
     else
     {
@@ -103,6 +105,7 @@ bool allocateProcessMemoryFirstFit(struct ProcessStruct *Process)
         struct sortedLinkedListNode *secCurrNode = splitNode(currNode, Process->memSize);
         struct memoryNode *memNode = createMemoryNode(secCurrNode->data->startLocation, Process->memSize, Process->id);
         insert(memoryUsed, memNode, secCurrNode->data->startLocation);
+        logMemoryAllocation(getClk(),Process->memSize,Process->id,memNode->startLocation,memNode->endLocation);
     }
 
     printMemory(memoryHoles, "Memory Holes after allocation");
