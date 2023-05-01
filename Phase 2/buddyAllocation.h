@@ -70,6 +70,7 @@ int allocateProcessMemoryBuddyRec(struct TreeNode* currNode, struct ProcessStruc
         currNode->processId = p->id;
         currNode->processMemSize = p->memSize;
         printf("the process %d settled from %d to %d size %d\n", p->id, left, right - 1, currNode->size);
+        addMemoryAllocation(getClk(), currNode->processMemSize, currNode->processId, left, right - 1);
         return 1;
     } else {
         printf("error no space in the TreeNode %d %d\n", p->id, currNode->size);
@@ -90,6 +91,7 @@ struct TreeNode* deallocateProcessMemoryBuddyRec(struct TreeNode* currNode, int 
 
     if(currNode->hasData == 1 && currNode->processId == id) {
         printf("the process %d removed from %d to %d size %d\n", currNode->processId, left, right - 1, currNode->size);
+        addMemoryDeallocation(getClk(), currNode->processMemSize, currNode->processId, left, right - 1);
         currNode->hasData = 0;
         if(currNode->left == NULL && currNode->right == NULL) {
             free(currNode);

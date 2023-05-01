@@ -1,6 +1,7 @@
 #include "math.h"
 #include "headers.h"
 #include "testing_functions.h"
+#include "logFiles.h"
 #include "firstFit.h"
 #include "buddyAllocation.h"
 #include "scheduling_algorithms.h"
@@ -174,6 +175,9 @@ int main(int argc, char *argv[])
     logFile = fopen("scheduler.log", "w");
     fprintf(logFile, "#At time x process y state arr w total z remain y wait k\n");
 
+    memoryLogFile = fopen("memory.log", "w");
+    fprintf(memoryLogFile, "#At time x allocated y bytes for process z from I to j\n");
+
     switch(memoryPolicy){
         case FIRST_FIT_POLICY:
             memoryHoles = createSortedLinkedList();
@@ -215,6 +219,7 @@ int main(int argc, char *argv[])
     }
 
     fclose(logFile);
+    fclose(memoryLogFile);
 
     generatePerfFile();
 
