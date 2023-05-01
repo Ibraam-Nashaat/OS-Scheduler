@@ -172,8 +172,8 @@ int main(int argc, char *argv[])
     selectedAlgorithm = atoi(argv[1]);
     memoryPolicy = atoi(argv[3]);
 
-    logFile = fopen("scheduler.log", "w");
-    fprintf(logFile, "#At time x process y state arr w total z remain y wait k\n");
+    schedulerLogFile = fopen("scheduler.log", "w");
+    fprintf(schedulerLogFile, "#At time x process y state arr w total z remain y wait k\n");
 
     memoryLogFile = fopen("memory.log", "w");
     fprintf(memoryLogFile, "#At time x allocated y bytes for process z from I to j\n");
@@ -218,7 +218,7 @@ int main(int argc, char *argv[])
         break;
     }
 
-    fclose(logFile);
+    fclose(schedulerLogFile);
     fclose(memoryLogFile);
 
     generatePerfFile();

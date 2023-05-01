@@ -9,7 +9,6 @@ struct msgBuff message;
 struct PQueue *readyProcessesPriorityQueue;
 struct Queue *readyProcessesQueue, *waitingProcessesQueue;
 struct ProcessStruct *runningProcess = NULL;
-FILE *logFile;
 
 // Run a process with a given quantum time
 // currProcess: a pointer to the process structure
@@ -22,7 +21,7 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
     if (runningProcess->pid != -1) // if the process started before, send CONTINUE_PROCESS signal to make it continue its execution
     {
         printf("\033[1;33mProcess with id %d and pid %d continued at time = %d\033[0m\n", runningProcess->id, runningProcess->pid, getClk());
-        fprintf(logFile, "At time %d process %d resumed arr %d total %d remain %d wait %d\n", getClk(), runningProcess->id, runningProcess->arrivalTime, runningProcess->runningTime, runningProcess->remainingTime, runningProcess->waitingTime);
+        logProcessResume(getClk(), runningProcess->id, runningProcess->arrivalTime, runningProcess->runningTime, runningProcess->remainingTime, runningProcess->waitingTime);
         runningProcess->waitingTime += (getClk() - runningProcess->lastStopedTime);
         kill(runningProcess->pid, CONTINUE_PROCESS);
         return;
@@ -50,7 +49,7 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
         }
     }
 
-    fprintf(logFile, "At time %d process %d started arr %d total %d remain %d wait %d\n", getClk(), runningProcess->id, runningProcess->arrivalTime, runningProcess->runningTime, runningProcess->remainingTime, runningProcess->waitingTime);
+    logProcessStart(getClk(), runningProcess->id, runningProcess->arrivalTime, runningProcess->runningTime, runningProcess->remainingTime, runningProcess->waitingTime);
 
     runningProcess->pid = pid;
     runningProcess->startTime = getClk();
@@ -73,7 +72,7 @@ void terminateProcess(int sigNum)
 
     sumWeightedTAT += weightedTAT;
 
-    fprintf(logFile, "At time %d process %d finished arr %d total %d remain %d wait %d TA %d WTA %.2f\n", getClk(), runningProcess->id, runningProcess->arrivalTime, runningProcess->runningTime, runningProcess->remainingTime, runningProcess->waitingTime, turnaroundTime, weightedTAT);
+    logProcessFinish(getClk(), runningProcess->id, runningProcess->arrivalTime, runningProcess->runningTime, runningProcess->remainingTime, runningProcess->waitingTime, turnaroundTime, weightedTAT);
     switch(memoryPolicy){
         case FIRST_FIT_POLICY:
             deallocateProcessMemoryFirstFit(runningProcess);
@@ -141,7 +140,7 @@ void blockProcess()
     }
     runningProcess->lastStopedTime = getClk();
     printf("\033[1;33mid = %d Blocked pid = %d remaining time = %d current time = %d\033[0m\n", runningProcess->id, runningProcess->pid, runningProcess->remainingTime, getClk());
-    fprintf(logFile, "At time %d process %d stopped arr %d total %d remain %d wait %d\n", getClk(), runningProcess->id, runningProcess->arrivalTime, runningProcess->runningTime, runningProcess->remainingTime, runningProcess->waitingTime);
+    logProcessStop(getClk(), runningProcess->id, runningProcess->arrivalTime, runningProcess->runningTime, runningProcess->remainingTime, runningProcess->waitingTime);
     isRunning = false;
     fflush(stdout);
 }
