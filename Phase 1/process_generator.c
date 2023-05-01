@@ -9,10 +9,10 @@ void clearResources(int signum)
     semctl(processGeneratorAndSchedulerSemID, 0, IPC_RMID, (struct semid_ds *)0);
 }
 
-void readFile(struct Queue *processQueue)
+void readFile(struct Queue *processQueue, char *fileName)
 {
     FILE *file;
-    file = fopen("processes.txt", "r");
+    file = fopen(fileName, "r");
     char firstLine[40];
     int id, arrivalTime, priority, runningTime;
 
@@ -32,26 +32,55 @@ void readFile(struct Queue *processQueue)
 
     fclose(file);
 }
-
-int getSchedulingAlgoFromUser(int *algo)
+bool readFromCmd(int argc, char *argv[], int *algo, int *quantum, char **fileName)
 {
-    int quantum = -1;
-    printf("Choose the scheduling algorithm:\n");
-    printf("1- HPF\n");
-    printf("2- SRTN\n");
-    printf("3- RR\n");
-    scanf("%d", &*algo);
-    while (*algo < 1 || *algo > 3)
+    if (argc < 4 || argc >6)
     {
-        printf("Enter a number between 1 and 3:\n");
-        scanf("%d", &*algo);
+        printf("The CMD arguments should be 4 or 6\n");
+        return false;
     }
-    if (*algo == 3)
+    *fileName = argv[1];
+
+    if (strcmp(argv[2], "-sch") == 0)
     {
-        printf("Enter the required quantum:\n");
-        scanf("%d", &quantum);
+        *algo = atoi(argv[3]);
+        if (*algo > 3 || *algo < 1)
+        {
+            printf("The scheduling algorithm number that you entered is invalid\n");
+            return false;
+        }
     }
-    return quantum;
+    else
+    {
+        printf("The CMD arguments doesn't match the required format\n");
+        return false;
+    }
+    /***
+     * -----------------------------------------------------------------
+     */
+    if (argc == 6)
+    {
+        if (strcmp(argv[4], "-q") == 0)
+        {
+            *quantum = atoi(argv[5]);
+            if (*quantum < 0)
+            {
+                printf("The quantum should be greater than zero\n");
+                return false;
+            }
+        }
+        else
+        {
+            printf("The CMD arguments doesn't match the required format\n");
+            return false;
+        }
+    }
+    else if(*algo==3 && argc<6)
+    {
+        printf("The quantum of RR is not specified\n");
+        return false;
+    }
+    return true;
 }
 
 void sendProcess(struct ProcessStruct *process)
@@ -70,12 +99,12 @@ int main(int argc, char *argv[])
     signal(SIGINT, clearResources);
     // TODO Initialization
     // 1. Read the input files.
+    int algo, quantum, memoryPolicy;
+    char *fileName;
+    if (!readFromCmd(argc, argv, &algo, &quantum, &fileName))
+        return 0;
     struct Queue *processQueue = createQueue();
-    readFile(processQueue);
-
-    // 2. Ask the user for the chosen scheduling algorithm and its parameters, if there are any.
-    int algo;
-    int quantum = getSchedulingAlgoFromUser(&algo);
+    readFile(processQueue,fileName);
 
     createSemaphore();
     createMessageQueue();
