@@ -8,61 +8,28 @@ void clearResources(int signum)
     semctl(processGeneratorAndSchedulerSemID, 0, IPC_RMID, (struct semid_ds *)0);
 }
 
-void readFile(struct Queue *processQueue)
+void readFile(struct Queue *processQueue, char *fileName)
 {
     FILE *file;
-    file = fopen("processes.txt", "r");
+    file = fopen(fileName, "r");
     char firstLine[40];
-    int id, arrivalTime, priority, runningTime,memSize;
+    int id, arrivalTime, priority, runningTime, memSize;
 
     if (fgets(firstLine, 40, file) == NULL)
     {
         perror("Unable to read the first line from file");
     }
 
-    while (fscanf(file, "%d\t%d\t%d\t%d\t%d", &id, &arrivalTime, &runningTime, &priority,&memSize) != EOF)
+    while (fscanf(file, "%d\t%d\t%d\t%d\t%d", &id, &arrivalTime, &runningTime, &priority, &memSize) != EOF)
     {
-        struct ProcessStruct *readProcess = create_process(id, arrivalTime, priority, runningTime,memSize);
+        struct ProcessStruct *readProcess = create_process(id, arrivalTime, priority, runningTime, memSize);
         enqueue(processQueue, readProcess);
     }
 
     // processQueue=testReadFile(processQueue);
-   // testLinkedList(processQueue);
+    // testLinkedList(processQueue);
 
     fclose(file);
-}
-
-int getSchedulingAlgoFromUser(int *algo)
-{
-    int quantum = -1;
-    printf("Choose the scheduling algorithm:\n");
-    printf("1- HPF\n");
-    printf("2- SRTN\n");
-    printf("3- RR\n");
-    scanf("%d", &*algo);
-    while (*algo < 1 || *algo > 3)
-    {
-        printf("Enter a number between 1 and 3:\n");
-        scanf("%d", &*algo);
-    }
-    if (*algo == 3)
-    {
-        printf("Enter the required quantum:\n");
-        scanf("%d", &quantum);
-    }
-    return quantum;
-}
-int getMemoryAllocationPolicyFromUser(){
-    int memoryPolicy;
-    printf("Choose the memory allocation policy:\n");
-    printf("1- First Fit\n");
-    printf("2- Buddy memory allocation\n");
-    scanf("%d",&memoryPolicy);
-    while(memoryPolicy<1 || memoryPolicy>2){
-        printf("Enter 1 or 2:\n");
-        scanf("%d", &memoryPolicy);
-    }
-    return memoryPolicy;
 }
 
 void sendProcess(struct ProcessStruct *process)
@@ -75,19 +42,104 @@ void sendProcess(struct ProcessStruct *process)
         perror("Errror in sending message from process generator to scheduler");
 }
 
+bool readFromCmd(int argc, char *argv[], int *algo, int *quantum, int *memoryPolicy, char **fileName)
+{
+    if (argc < 6)
+    {
+        printf("The CMD arguments should be at least 6\n");
+        return false;
+    }
+    *fileName = argv[1];
+    
+    if (strcmp(argv[2], "-sch")==0)
+    { 
+        *algo =atoi(argv[3]);
+        if (*algo > 3 || *algo < 1)
+        {
+            printf("The scheduling algorithm number that you entered is invalid\n");
+            return false;
+        }
+    }
+    else
+    {
+        printf("The CMD arguments doesn't match the required format\n");
+        return false;
+    }
+    /***
+     * -----------------------------------------------------------------
+     */
+    if (strcmp(argv[4], "-q")==0)
+    {
+        *quantum = atoi(argv[5]);
+        if (*quantum < 0)
+        {
+            printf("The quantum should be greater than zero\n");
+            return false;
+        }
+    }
+    else if (strcmp(argv[4], "-mem")==0)
+    {
+        if(*algo==3){
+            printf("The chosen algoirthm is RR but quntum not specified\n");
+            return 0;
+        }
+        *memoryPolicy = atoi(argv[5]);
+        if (*memoryPolicy < 1 || *memoryPolicy > 2)
+        {
+            printf("The memory policy number that you entered is invalid\n");
+            return false;
+        }
+    }
+    else
+    {
+        printf("The CMD arguments doesn't match the required format\n");
+        return false;
+    }
+
+    /**
+     * -----------------------------------------------------------------------
+     */
+
+    if (argc <= 8 && argc > 6)
+    {
+        if (strcmp(argv[6], "-mem")==0)
+        {
+            *memoryPolicy = atoi(argv[7]);
+            if (*memoryPolicy < 1 || *memoryPolicy > 2)
+            {
+                printf("The memory policy number that you entered is invalid\n");
+                return false;
+            }
+        }
+        else
+        {
+            printf("The CMD arguments doesn't match the required format\n");
+            return false;
+        }
+    }
+    else if (argc > 8)
+    {
+        printf("CMD arguments are greater than expected\n");
+        return false;
+    }
+    return true;
+}
+
 int main(int argc, char *argv[])
 {
 
     signal(SIGINT, clearResources);
     // TODO Initialization
     // 1. Read the input files.
+    int algo, quantum, memoryPolicy;
+    char *fileName;
+    if (!readFromCmd(argc, argv, &algo, &quantum, &memoryPolicy, &fileName))
+        return 0;
     struct Queue *processQueue = createQueue();
-    readFile(processQueue);
+    readFile(processQueue, fileName);
     
+
     // 2. Ask the user for the chosen scheduling algorithm and its parameters, if there are any.
-    int algo;
-    int quantum = getSchedulingAlgoFromUser(&algo);
-    int memoryPolicy=getMemoryAllocationPolicyFromUser();
 
     createSemaphore();
     createMessageQueue();
@@ -102,11 +154,11 @@ int main(int argc, char *argv[])
     schedulerPID = fork();
     if (schedulerPID == 0)
     {
-        char algoAsChar[13], quantumAsChar[13],memoryPolicyAsChar[13];
+        char algoAsChar[13], quantumAsChar[13], memoryPolicyAsChar[13];
         sprintf(algoAsChar, "%d", algo);
         sprintf(quantumAsChar, "%d", quantum);
-        sprintf(memoryPolicyAsChar,"%d",memoryPolicy);
-        char *args[] = {"./scheduler.out", algoAsChar, quantumAsChar,memoryPolicyAsChar, NULL};
+        sprintf(memoryPolicyAsChar, "%d", memoryPolicy);
+        char *args[] = {"./scheduler.out", algoAsChar, quantumAsChar, memoryPolicyAsChar, NULL};
         execvp(args[0], args);
     }
     // 4. Use this function after creating the clock process to initialize clock
