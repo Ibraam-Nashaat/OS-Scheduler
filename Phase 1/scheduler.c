@@ -5,26 +5,6 @@
 int numberOfProcesses = 0;
 int totalRunningTime = 0;
 
-void pushProcessToSRTN(struct ProcessStruct process)
-{
-    if (process.id != -1)
-    {
-        struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
-                                                          process.runningTime);
-        push(priorityQueue, newProcess, newProcess->remainingTime);
-    }
-}
-
-void pushProcessToHPF(struct ProcessStruct process)
-{
-    if (process.id != -1)
-    {
-        struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
-                                                          process.runningTime);
-        push(priorityQueue, newProcess, newProcess->priority);
-    }
-}
-
 
 
 void getProcess(int signum)
