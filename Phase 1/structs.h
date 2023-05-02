@@ -39,4 +39,5 @@ struct Node
 struct Queue
 {
     struct Node *head, *tail;
+    int size;
 };

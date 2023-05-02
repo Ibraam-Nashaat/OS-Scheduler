@@ -7,6 +7,7 @@ struct Queue *createQueue()
     // Intialize queue
     q->head = NULL;
     q->tail = NULL;
+    q->size=0;
     return q;
 };
 // intailiaze new node
@@ -33,6 +34,7 @@ bool isEmptyQueue(struct Queue *q)
 void enqueue(struct Queue *q, struct ProcessStruct *process)
 {
     struct Node *nNode = newQueueNode(process);
+    q->size++;
     // codition if queue is empty
     if (q->head == NULL)
     {
@@ -58,6 +60,7 @@ struct ProcessStruct *dequeue(struct Queue *q)
     struct Node *temp = q->head;
     q->head = q->head->next;
     process = temp->data;
+    q->size--;
     free(temp);
     return process;
 }
@@ -66,4 +69,13 @@ struct ProcessStruct *peekQueue(struct Queue *q)
     if (isEmptyQueue(q))
         return NULL;
     return q->head->data;
+}
+struct ProcessStruct *peekQueueTail(struct Queue *q)
+{
+    if (isEmptyQueue(q))
+        return NULL;
+    return q->tail->data;
+}
+int queueSize(struct Queue *q){
+    return q->size;
 }

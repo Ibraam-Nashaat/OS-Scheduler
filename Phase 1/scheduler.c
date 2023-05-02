@@ -25,15 +25,7 @@ void pushProcessToHPF(struct ProcessStruct process)
     }
 }
 
-void pushProcessToRR(struct ProcessStruct process)
-{
-    if (process.id != -1)
-    {
-        struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
-                                                          process.runningTime);
-        enqueue(queue, newProcess);
-    }
-}
+
 
 void getProcess(int signum)
 {
@@ -68,7 +60,7 @@ void getProcess(int signum)
         }
         break;
     case 3:
-        pushProcessToRR(message.process);
+        checkIfProcessArrivedAtSameTimeOfQuantumFininshed(message.process);
         break;
     }
 
