@@ -50,7 +50,8 @@ void pushProcessToRR(struct ProcessStruct process)
 }
 bool tryAllocatingMemory(struct ProcessStruct process)
 {
-    if (memoryPolicy == 1){
+    if (memoryPolicy == 1)
+    {
         return allocateProcessMemoryFirstFit(&process);
     }
     else
@@ -78,7 +79,8 @@ void getProcess(int signum)
     case 1:
         if (tryAllocatingMemory(message.process))
             pushProcessToHPF(message.process);
-        else{
+        else
+        {
             printf("Pushing process %d to waiting queue\n", message.process.id);
             pushProcessToWaitingQueue(message.process);
         }
@@ -97,7 +99,8 @@ void getProcess(int signum)
                     runningProcess->remainingTime = tempRunningRime;
             }
         }
-        else{
+        else
+        {
             printf("Pushing process %d to waiting queue\n", message.process.id);
             pushProcessToWaitingQueue(message.process);
         }
@@ -105,7 +108,8 @@ void getProcess(int signum)
     case 3:
         if (tryAllocatingMemory(message.process))
             pushProcessToRR(message.process);
-        else{
+        else
+        {
             printf("Pushing process %d to waiting queue\n", message.process.id);
             pushProcessToWaitingQueue(message.process);
         }
@@ -147,7 +151,7 @@ void generatePerfFile()
     float meanWTA = sumWeightedTAT / (float)numberOfProcesses;
     float stdDev = sqrt(abs(((sumWeightedTAT) - (numberOfProcesses * pow(meanWTA, 2)))) / (float)numberOfProcesses);
 
-    fprintf(perfFile,"Std WTA = %.2f\n", stdDev);
+    fprintf(perfFile, "Std WTA = %.2f\n", stdDev);
 
     fclose(perfFile);
 }
@@ -178,21 +182,22 @@ int main(int argc, char *argv[])
     memoryLogFile = fopen("memory.log", "w");
     fprintf(memoryLogFile, "#At time x allocated y bytes for process z from I to j\n");
 
-    switch(memoryPolicy){
-        case FIRST_FIT_POLICY:
-            memoryHoles = createSortedLinkedList();
-            memoryUsed = createSortedLinkedList();
-            struct memoryNode *memoryNode = createMemoryNode(0, 1024, -1);
-            insert(memoryHoles, memoryNode, 0);
-            break;
+    switch (memoryPolicy)
+    {
+    case FIRST_FIT_POLICY:
+        memoryHoles = createSortedLinkedList();
+        memoryUsed = createSortedLinkedList();
+        struct memoryNode *memoryNode = createMemoryNode(0, 1024, -1);
+        insert(memoryHoles, memoryNode, 0);
+        break;
 
-        case BUDDY_POLICY:
-            buddyMemoryNode = createTreeNode(1024);
-            break;
+    case BUDDY_POLICY:
+        buddyMemoryNode = createTreeNode(1024);
+        break;
 
-        default:
-            printf("Invalid policy selected.\n");
-            break;
+    default:
+        printf("Invalid policy selected.\n");
+        break;
     }
 
     waitingProcessesQueue = createQueue(); // Queue containing processes that can't be allocated

@@ -29,15 +29,15 @@ void SRTN(struct PQueue *pQueue)
     struct ProcessStruct *readyProcess; // pointer for processes in Pqueue
     readyProcessesPriorityQueue = pQueue;
     while (algorithmFlag || !isEmptyPQ(readyProcessesPriorityQueue) || isRunning)
-    {                                 // while queue isn't empty or running
+    {                                               // while queue isn't empty or running
         if (isEmptyPQ(readyProcessesPriorityQueue)) // queue is empty doesn't do anything
             continue;
         if (!isRunning && algorithmBlockingFlag)
-        {                                       // isn't running and in Pqueue --> run it
+        {                                                     // isn't running and in Pqueue --> run it
             readyProcess = peek(readyProcessesPriorityQueue); // get the process with the shortest remaining time
             pop(readyProcessesPriorityQueue);                 // remove it from the queue
-            runningProcess = readyProcess;      // assign it to the running process
-            runProcess(readyProcess, -1);       // run it with no quantum time
+            runningProcess = readyProcess;                    // assign it to the running process
+            runProcess(readyProcess, -1);                     // run it with no quantum time
         }
     }
 };
@@ -58,7 +58,7 @@ void quantumFinished(int signum)
 void RR(struct Queue *q, int quant)
 {
     struct ProcessStruct *readyProcess; // pointer for processes in queue
-    readyProcessesQueue = q;                          // set the global queue variable to q
+    readyProcessesQueue = q;            // set the global queue variable to q
     quantum = quant;                    // set the global quantum variable to quant
     while (algorithmFlag || !isEmptyQueue(readyProcessesQueue) || isRunning)
     { // while the algorithm flag is true or the queue is not empty or a process is running
@@ -68,10 +68,10 @@ void RR(struct Queue *q, int quant)
             continue;
         }
         if (!isRunning)
-        {                                      // if no process is running and there are processes in queue, run the first one
-            readyProcess = dequeue(readyProcessesQueue);     // get the first process from the queue
-            runningProcess = readyProcess;     // set the global running process variable to readyProcess
-            runProcess(readyProcess, quantum); // run the ready process with quantum time
+        {                                                // if no process is running and there are processes in queue, run the first one
+            readyProcess = dequeue(readyProcessesQueue); // get the first process from the queue
+            runningProcess = readyProcess;               // set the global running process variable to readyProcess
+            runProcess(readyProcess, quantum);           // run the ready process with quantum time
         }
     }
 };
