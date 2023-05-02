@@ -26,6 +26,7 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
         fprintf(logFile, "At time %d process %d resumed arr %d total %d remain %d wait %d\n", getClk(), runningProcess->id, runningProcess->arrivalTime, runningProcess->runningTime, runningProcess->remainingTime, runningProcess->waitingTime);
         runningProcess->waitingTime += (getClk() - runningProcess->lastStopedTime);
         kill(runningProcess->pid, CONTINUE_PROCESS);
+        runningProcess->lastStartingTime=getClk();
         return;
     }
     int pid = fork();
@@ -57,12 +58,14 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
     runningProcess->startTime = getClk();
     runningProcess->waitingTime = runningProcess->startTime - runningProcess->arrivalTime;
     runningProcess->lastStopedTime = getClk();
+    runningProcess->lastStartingTime=getClk();
 }
 
 // This function terminates the process and frees the memory
 // sigNum: the signal number for termination
 void terminateProcess(int sigNum)
 {
+    runningProcess->remainingTime=(runningProcess->remainingTime)-(getClk()-runningProcess->lastStartingTime);
     totalWaitingTime += runningProcess->waitingTime;
     printf("\033[1;32mProcess %d finished at time = %d\033[0m\n", runningProcess->id, getClk());
     int turnaroundTime = getClk() - runningProcess->arrivalTime;
@@ -85,6 +88,7 @@ void terminateProcess(int sigNum)
 // This function blocks the process, puts it at the end of the queue or the priority queue depending on the algorithm, and makes isRunning=false to begin another process.
 void blockProcess()
 {
+     runningProcess->remainingTime=(runningProcess->remainingTime)-(getClk()-runningProcess->lastStartingTime);
     if (selectedAlgorithm == 3)
     {
         // For round robin algorithm, enqueue the process at the end of the queue
@@ -101,6 +105,7 @@ void blockProcess()
         kill(runningProcess->pid, SIGSTOP);
         push(priorityQueue, runningProcess, runningProcess->remainingTime);
     }
+   
     runningProcess->lastStopedTime = getClk();
     printf("\033[1;33mid = %d Blocked pid = %d remaining time = %d current time = %d\033[0m\n", runningProcess->id, runningProcess->pid, runningProcess->remainingTime, getClk());
     fprintf(logFile, "At time %d process %d stopped arr %d total %d remain %d wait %d\n", getClk(), runningProcess->id, runningProcess->arrivalTime, runningProcess->runningTime, runningProcess->remainingTime, runningProcess->waitingTime);
