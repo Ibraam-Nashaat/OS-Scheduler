@@ -1,4 +1,5 @@
 #include "algorithms_utils.h"
+#include "scheduler_utils.h"
 
 // This function implements the highest priority first algorithm
 // pqueue: a pointer to the priority queue structure
@@ -46,10 +47,7 @@ void SRTN(struct PQueue *pQueue)
 // signum: the signal number
 void quantumFinished(int signum)
 {
-    if (isEmptyQueue(queue)) // if the queue is empty, continue the running process
-        kill(runningProcess->pid, SIGCONT);
-    else // otherwise, block the running process
-        blockProcess();
+    blockProcess();
 }
 
 // Implement the RR algorithm

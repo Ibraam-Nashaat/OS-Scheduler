@@ -8,6 +8,7 @@ struct ProcessStruct
         startTime,
         waitingTime,
         lastStopedTime,
+        lastStartingTime,
         pid,
         memSize;
 };

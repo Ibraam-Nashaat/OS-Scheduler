@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
             remainingTime--;
             if (currentQuantum != -1)
                 currentQuantum--;
-            if (currentQuantum == 0)
+            if (currentQuantum == 0 && remainingTime!=0)
             {
                 // Send signal to parent process that quantum expired
                 kill(getppid(), QUANTUM_FINISHED);

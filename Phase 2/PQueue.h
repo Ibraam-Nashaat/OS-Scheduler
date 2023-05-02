@@ -35,12 +35,12 @@ void push(struct PQueue *pq, struct ProcessStruct *process, int priority)
     }
     else
     {
-        if (priority <= PQnodehead->priority) // LOW priority first
+        if (priority < PQnodehead->priority) // LOW priority first
         {
             nNode->next = PQnodehead;
             pq->head = nNode;
         }
-        else if (priority > PQnodehead->priority) // if not try to rearrange itself
+        else if (priority >= PQnodehead->priority) // if not try to rearrange itself
         {
             while ((PQnodehead->next != NULL) && (PQnodehead->next->priority <= priority))
                 PQnodehead = PQnodehead->next;

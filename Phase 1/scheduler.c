@@ -5,35 +5,7 @@
 int numberOfProcesses = 0;
 int totalRunningTime = 0;
 
-void pushProcessToSRTN(struct ProcessStruct process)
-{
-    if (process.id != -1)
-    {
-        struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
-                                                          process.runningTime);
-        push(priorityQueue, newProcess, newProcess->remainingTime);
-    }
-}
 
-void pushProcessToHPF(struct ProcessStruct process)
-{
-    if (process.id != -1)
-    {
-        struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
-                                                          process.runningTime);
-        push(priorityQueue, newProcess, newProcess->priority);
-    }
-}
-
-void pushProcessToRR(struct ProcessStruct process)
-{
-    if (process.id != -1)
-    {
-        struct ProcessStruct *newProcess = create_process(process.id, process.arrivalTime, process.priority,
-                                                          process.runningTime);
-        enqueue(queue, newProcess);
-    }
-}
 
 void getProcess(int signum)
 {
@@ -60,15 +32,15 @@ void getProcess(int signum)
         if (isRunning)
         {
             int tempRunningRime = runningProcess->remainingTime;
-            runningProcess->remainingTime = runningProcess->remainingTime - (getClk() - runningProcess->lastStopedTime);
-            if (message.process.runningTime < runningProcess->remainingTime)
+            int processRemainingtime = runningProcess->remainingTime - (getClk() - runningProcess->lastStartingTime);
+            if (message.process.runningTime < processRemainingtime)
                 blockProcess();
             else
                 runningProcess->remainingTime = tempRunningRime;
         }
         break;
     case 3:
-        pushProcessToRR(message.process);
+        checkIfProcessArrivedAtSameTimeOfQuantumFininshed(message.process);
         break;
     }
 

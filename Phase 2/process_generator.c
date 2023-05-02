@@ -50,10 +50,10 @@ bool readFromCmd(int argc, char *argv[], int *algo, int *quantum, int *memoryPol
         return false;
     }
     *fileName = argv[1];
-    
-    if (strcmp(argv[2], "-sch")==0)
-    { 
-        *algo =atoi(argv[3]);
+
+    if (strcmp(argv[2], "-sch") == 0)
+    {
+        *algo = atoi(argv[3]);
         if (*algo > 3 || *algo < 1)
         {
             printf("The scheduling algorithm number that you entered is invalid\n");
@@ -68,7 +68,7 @@ bool readFromCmd(int argc, char *argv[], int *algo, int *quantum, int *memoryPol
     /***
      * -----------------------------------------------------------------
      */
-    if (strcmp(argv[4], "-q")==0)
+    if (strcmp(argv[4], "-q") == 0)
     {
         *quantum = atoi(argv[5]);
         if (*quantum < 0)
@@ -77,9 +77,10 @@ bool readFromCmd(int argc, char *argv[], int *algo, int *quantum, int *memoryPol
             return false;
         }
     }
-    else if (strcmp(argv[4], "-mem")==0)
+    else if (strcmp(argv[4], "-mem") == 0)
     {
-        if(*algo==3){
+        if (*algo == 3)
+        {
             printf("The chosen algoirthm is RR but quntum not specified\n");
             return 0;
         }
@@ -102,7 +103,7 @@ bool readFromCmd(int argc, char *argv[], int *algo, int *quantum, int *memoryPol
 
     if (argc <= 8 && argc > 6)
     {
-        if (strcmp(argv[6], "-mem")==0)
+        if (strcmp(argv[6], "-mem") == 0)
         {
             *memoryPolicy = atoi(argv[7]);
             if (*memoryPolicy < 1 || *memoryPolicy > 2)
@@ -137,7 +138,6 @@ int main(int argc, char *argv[])
         return 0;
     struct Queue *processQueue = createQueue();
     readFile(processQueue, fileName);
-    
 
     // 2. Ask the user for the chosen scheduling algorithm and its parameters, if there are any.
 

@@ -24,6 +24,7 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
         logProcessResume(getClk(), runningProcess->id, runningProcess->arrivalTime, runningProcess->runningTime, runningProcess->remainingTime, runningProcess->waitingTime);
         runningProcess->waitingTime += (getClk() - runningProcess->lastStopedTime);
         kill(runningProcess->pid, CONTINUE_PROCESS);
+        runningProcess->lastStartingTime=getClk();
         return;
     }
     int pid = fork();
@@ -55,12 +56,14 @@ void runProcess(struct ProcessStruct *currProcess, int quantum)
     runningProcess->startTime = getClk();
     runningProcess->waitingTime = runningProcess->startTime - runningProcess->arrivalTime;
     runningProcess->lastStopedTime = getClk();
+    runningProcess->lastStartingTime=getClk();
 }
 
 // This function terminates the process and frees the memory
 // sigNum: the signal number for termination
 void terminateProcess(int sigNum)
 {
+    runningProcess->remainingTime=(runningProcess->remainingTime)-(getClk()-runningProcess->lastStartingTime);
     totalWaitingTime += runningProcess->waitingTime;
     printf("\033[1;32mProcess %d finished at time = %d\033[0m\n", runningProcess->id, getClk());
     int turnaroundTime = getClk() - runningProcess->arrivalTime;
@@ -73,14 +76,15 @@ void terminateProcess(int sigNum)
     sumWeightedTAT += weightedTAT;
 
     logProcessFinish(getClk(), runningProcess->id, runningProcess->arrivalTime, runningProcess->runningTime, runningProcess->remainingTime, runningProcess->waitingTime, turnaroundTime, weightedTAT);
-    switch(memoryPolicy){
-        case FIRST_FIT_POLICY:
-            deallocateProcessMemoryFirstFit(runningProcess);
-            break;
+    switch (memoryPolicy)
+    {
+    case FIRST_FIT_POLICY:
+        deallocateProcessMemoryFirstFit(runningProcess);
+        break;
 
-        case BUDDY_POLICY:
-            deallocateProcessMemoryBuddy(runningProcess);
-            break;
+    case BUDDY_POLICY:
+        deallocateProcessMemoryBuddy(runningProcess);
+        break;
     }
 
     free(runningProcess);
@@ -89,38 +93,50 @@ void terminateProcess(int sigNum)
     fflush(stdout);
 
     struct ProcessStruct *waitingProcess = peekQueue(waitingProcessesQueue);
-    //printf("PROCESS ID IS %d AND MEMSIZE IS %d\n", waitingProcess->id, waitingProcess->memSize);
+    bool allocatedWaitingProcess = 1;
+    // printf("PROCESS ID IS %d AND MEMSIZE IS %d\n", waitingProcess->id, waitingProcess->memSize);
 
-    if (waitingProcess != NULL)
+    while (waitingProcess != NULL && allocatedWaitingProcess == 1)
     {
-        int firstFitAllocation = 0, buddyAllocation = 0;
-        switch(memoryPolicy){
-            case FIRST_FIT_POLICY:
-                printf("Trying to allocate %d with first fit\n", waitingProcess->id);
-                firstFitAllocation = allocateProcessMemoryFirstFit(waitingProcess);
-                break;
+        bool firstFitAllocation = 0, buddyAllocation = 0;
+        switch (memoryPolicy)
+        {
+        case FIRST_FIT_POLICY:
+            // printf("Trying to allocate %d with first fit\n", waitingProcess->id);
+            firstFitAllocation = allocateProcessMemoryFirstFit(waitingProcess);
+            break;
 
-            case BUDDY_POLICY:
-                printf("Trying to allocate %d with buddy\n", waitingProcess->id);
-                buddyAllocation = allocateProcessMemoryBuddy(waitingProcess);
-                break;
+        case BUDDY_POLICY:
+            // printf("Trying to allocate %d with buddy\n", waitingProcess->id);
+            buddyAllocation = allocateProcessMemoryBuddy(waitingProcess);
+            break;
         }
-        if(firstFitAllocation == 1 || buddyAllocation == 1){
+        if (firstFitAllocation == 1 || buddyAllocation == 1)
+        {
             waitingProcess = dequeue(waitingProcessesQueue);
-            printf("Process %d is dequeued from the waiting queue\n", waitingProcess->id);
+            // printf("Process %d is dequeued from the waiting queue\n", waitingProcess->id);
             if (selectedAlgorithm == 1)
                 push(readyProcessesPriorityQueue, waitingProcess, waitingProcess->priority);
             else if (selectedAlgorithm == 2)
                 push(readyProcessesPriorityQueue, waitingProcess, waitingProcess->remainingTime);
             else if (selectedAlgorithm == 3)
                 enqueue(readyProcessesQueue, waitingProcess);
+
+            allocatedWaitingProcess = 1;
         }
+        else
+        {
+            allocatedWaitingProcess = 0;
+        }
+
+        waitingProcess = peekQueue(waitingProcessesQueue);
     }
 }
 
 // This function blocks the process, puts it at the end of the queue or the priority queue depending on the algorithm, and makes isRunning=false to begin another process.
 void blockProcess()
 {
+    runningProcess->remainingTime=(runningProcess->remainingTime)-(getClk()-runningProcess->lastStartingTime);
     if (selectedAlgorithm == 3)
     {
         // For round robin algorithm, enqueue the process at the end of the queue

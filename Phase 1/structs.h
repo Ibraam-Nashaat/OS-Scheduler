@@ -8,6 +8,7 @@ struct ProcessStruct
         startTime,
         waitingTime,
         lastStopedTime,
+        lastStartingTime,
         pid;
 };
 
@@ -38,4 +39,5 @@ struct Node
 struct Queue
 {
     struct Node *head, *tail;
+    int size;
 };
