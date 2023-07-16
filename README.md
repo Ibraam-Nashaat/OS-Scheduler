@@ -9,11 +9,11 @@ This project aims to implement a CPU scheduler with its complementary components
 - Phase 1 Folder:
   1. `cd Phase 1`
   2. `make build`
-  3. `./process_generator.out processes.txt -sch x -q y`,  where `x` is the either 1,2 or 3 (where 1 represents HPF, 2 represents SRTN and 3 represents RR). Note that you provide `-q y` argument only in case you selected RR algorithm, where `y` is the quantum.
+  3. `./process_generator.out processes.txt -sch x -q y`,  where `x` is either 1,2 or 3 (where 1 represents HPF, 2 represents SRTN and 3 represents RR). Note that you provide `-q y` argument only in case you selected RR algorithm, where `y` is the quantum.
 - Phase 2 Folder:
   1. `cd Phase 2`
   2. `make build`
-  3. `./process_generator.out processes.txt -sch x -q y -mem z`,  where `x` is the either 1,2 or 3 (where 1 represents HPF, 2 represents SRTN and 3 represents RR) and `z` is the memory policy and it is either 1 or 2 (where 1 represents first fit and 2 represents buddy memory allocation). Note that you provide `-q y` argument only in case you selected RR algorithm, where `y` is the quantum.
+  3. `./process_generator.out processes.txt -sch x -q y -mem z`,  where `x` is either 1,2 or 3 (where 1 represents HPF, 2 represents SRTN and 3 represents RR) and `z` is the memory policy and it is either 1 or 2 (where 1 represents first fit and 2 represents buddy memory allocation). Note that you provide `-q y` argument only in case you selected RR algorithm, where `y` is the quantum.
 
 ## System Description
 
