@@ -5,7 +5,7 @@ This project aims to implement a CPU scheduler with its complementary components
 1. Linux
 2. GCC Compiler
 
-## How to Run using CMD
+## How to run using the terminal
 - Phase 1 Folder:
   1. `cd Phase 1`
   2. `make build`
